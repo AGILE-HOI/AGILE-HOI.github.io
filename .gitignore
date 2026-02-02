@@ -77,3 +77,5 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,linux,windows
 data
+
+static/img/header_scroll.gif
