@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Cupid: Generative 3D Reconstruction via Joint Object and Pose Modeling</title>
+    <link rel="icon" type="image/x-icon" href="/static/img/icons/cupid.png">
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Open Graph -->
+    <meta property="og:url" content="https://cupid3d.github.io/" />
+    <meta property="og:image" content="https://cupid3d.github.io/static/img/Cupid.png" />
+    <meta property="og:title" content="Cupid: Generative 3D Reconstruction via Joint Object and Pose Modeling" />
+    <meta property="og:description"
+        content="A new generation-based 3D reconstruction method that accurately infers the camera pose, 3D shape, and texture of an object from a single 2D image." />
+
+    <!-- Twitter -->
+    <meta name="twitter:url" content="https://cupid3d.github.io/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://cupid3d.github.io/static/img/Cupid.png" />
+    <meta name="twitter:title" content="Cupid: Generative 3D Reconstruction via Joint Object and Pose Modeling" />
+    <meta name="twitter:description"
+        content="A new generation-based 3D reconstruction method that accurately infers the camera pose, 3D shape, and texture of an object from a single 2D image." />
+
+    <script src="./static/js/distill_template.v2.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    
+    <!-- MathJax Configuration -->
+    <script>
+        window.MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']],
+            processEscapes: true,
+            processEnvironments: true,
+            tags: 'ams',
+            macros: {
+              argmin: '\\operatorname*{arg\\,min}',
+              argmax: '\\operatorname*{arg\\,max}'
+            }
+          },
+          options: {
+            skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+          }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-collection.v1.min.js"></script>
+    <script src="https://rawgit.com/nstrayer/slid3r/master/dist/slid3r.js"></script>
+
+    <script defer="" src="./static/js/hider.js"></script>
+    <script src="./static/js/image_interact.js"></script>
+    <script src="./static/js/switch_videos.js"></script>
+
+    <link rel="stylesheet" href="./static/css/style.css">
+    <link rel="stylesheet" href="./static/css/rerun-viewer.css">
+    <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+    <script defer src="./static/js/fontawesome.all.min.js"></script>
+
+
+    <!-- medium zoom https://github.com/francoischalifour/medium-zoom -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script> <!-- jquery -->
+    <script defer src="./static/js/medium-zoom.min.js"></script>
+    <script defer src="./static/js/zoom.js"></script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RY5G0G0QKD"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'G-RY5G0G0QKD');
+    </script>
+</head>
+
+<body>
+
+    <div class="header-wrapper">
+        <div class="header-container" id="header-container">
+            <div class="header-content">
+                <h1 style="margin-top: 0px">Cupid</h1>
+                <h2>Generative 3D Reconstruction
+                     via Joint Object and Pose Modeling</h2>
+                <p>
+                    Introducing Cupid, a 3D generator that accurately infers the
+                    camera pose, 3D shape, and texture from a single image.
+                </p>
+
+                <div class="icon-container">
+                    <div class="icon-item">
+                        <img src="./static/img/icons/formula.svg" alt="Visual Representation Icon">
+                        <div><strong>Novel Generative Formulation</strong>: We reframe 3D reconstruction by jointly
+                            synthesizing the object and its camera pose. This grounds the generation process, creating
+                            an explicit link between the 3D output and the 2D input view.
+                        </div>
+                    </div>
+                    <div class="icon-item">
+                        <img src="./static/img/icons/camera.svg" alt="Connector Design Icon">
+                        <div><strong>Pose-Conditioned Architecture</strong>: We design a generator with a pose-aligned
+                            conditioner. This novel mechanism directly injects <em>pixel information</em> into the
+                            synthesis
+                            process to prevent color drift and ensure textural fidelity.
+                        </div>
+                    </div>
+                    <div class="icon-item">
+                        <img src="./static/img/icons/cube.svg" alt="Instruction Tuning Data Icon">
+                        <div><strong>Unified and Versatile Model</strong>: Our approach is a unified, versatile model
+                            that
+                            excels at diverse 3D synthesis tasks, including <em>single image reconstruction</em>, <em>scene
+                                generation</em>, and <em>multi-view reconstruction</em>, without task-specific tuning.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div class="button-container"> -->
+                    <!-- replace arxiv -->
+                    <!-- <a href="https://arxiv.org/abs/2510.20776" class="button paper-link" target="_blank">
+                        <span class="icon is-small">
+                            <i class="ai ai-arxiv"></i>
+                        </span>
+                        arXiv
+                    </a> -->
+                    <!-- replace pdf -->
+                    <!-- <a href="./cupid_paper.pdf" class="button paper-link" target="_blank">
+                        <span class="icon is-small">
+                            <i class="fas fa-file-pdf"></i>
+                        </span>
+                        <span>pdf</span>
+                    </a> -->
+                    <!-- replace image -->
+                    <!-- <a class="button" aria-disabled="true" tabindex="-1" style="pointer-events: none; opacity: 0.6;"> -->
+                    <!-- <a href="https://github.com/cupid3d/Cupid" class="button paper-link" target="_blank">
+                        <span class="icon is-small">
+                            <i class="fab fa-github"></i>
+                        </span>
+                        <span>Code</span>
+                    </a> -->
+                    <!-- YouTube teaser button -->
+                    <!-- <a href="https://youtu.be/S7Bqwg_q4W0" class="button paper-link" target="_blank" rel="noopener noreferrer" aria-label="Watch teaser on YouTube">
+                        <span class="icon is-small">
+                            <i class="fab fa-youtube"></i>
+                        </span>
+                        <span>Video</span>
+                    </a> -->
+                    
+                    <!-- <br>
+                </div> -->
+            </div>
+            <!-- header image (intentionally left blank; teaser video placed above Abstract) -->
+            <div class="header-image">
+                <img draggable="false" src="static/img/Cupid.png" alt="Teaser Image" class="teaser-image">
+            </div>
+        </div>
+    </div>
+    <d-article>
+        <!-- for author information -->
+        <!-- <div class="byline">
+            <div class="byline-container">
+                <div class="byline-column" style="line-height: 1.2;">
+                    <h3 style="font-size: 1.2em; margin-bottom: 0.2em;">Authors</h3>
+                    <p style="margin: 0;">
+                        <a href="https://github.com/hbb1", class="author-link" style="font-size: 0.9em;">Binbin Huang</a>
+                        <sup style="font-size: 0.9em;">1,2,†</sup>
+                    </p>
+                    <p style="margin: 0;">
+                        <a href="https://scholar.google.com/citations?user=LTzbpW8AAAAJ&hl=zh-CN" class="author-link" style="font-size: 0.9em;">Haobin Duan</a>
+                        <sup style="font-size: 0.9em;">1,†</sup>
+                    </p>
+                    <p style="margin: 0;">
+                        <a href="https://scholar.google.com/citations?user=1UD_eBQAAAAJ&hl=en" class="author-link" style="font-size: 0.9em;">Yiqun Zhao</a>
+                        <sup style="font-size: 0.9em;">1,2</sup>
+                    </p>
+                    <p style="margin: 0;">
+                        <a href="https://maikouuu.github.io/" class="author-link" style="font-size: 0.9em;">Zibo Zhao</a>
+                        <sup style="font-size: 0.9em;">3</sup>
+                    </p>
+                    <p style="margin: 0;">
+                        <a href="https://people.eecs.berkeley.edu/~yima/" class="author-link" target="_blank"
+                            style="font-size: 0.9em;">Yi Ma</a>
+                        <sup style="font-size: 0.9em;">1</sup>
+                    </p>
+                    <p style="margin: 0;">
+                        <a href="https://scholar.google.com.sg/citations?user=fe-1v0MAAAAJ&hl=en" class="author-link"
+                            target="_blank" style="font-size: 0.9em;">Shenghua Gao</a>
+                        <sup style="font-size: 0.9em;">1,‡</sup>
+                    </p>
+                </div>
+
+                <div class="byline-column" style="line-height: 1.2;">
+                    <h3 style="font-size: 1.2em; margin-bottom: 0.2em;">Affiliations</h3>
+                    <p style="margin: 0;">
+                        <sup style="font-size: 0.8em;">1</sup>
+                        <a href="https://www.hku.hk/" class="affiliation-link" target="_blank"
+                            style="font-size: 0.9em;">HKU</a>
+                    </p>
+                    <p style="margin: 0;">
+                        <sup style="font-size: 0.8em;">2</sup>
+                        <span class="affiliation-link" style="font-size: 0.9em;">Transcengram</span>
+                    </p>
+                    <p style="margin: 0;">
+                        <sup style="font-size: 0.8em;">3</sup>
+                        <a href="https://www.tencent.com/" class="affiliation-link" target="_blank"
+                            style="font-size: 0.9em;">Tencent</a>
+                    </p>
+                    <br>
+                    <br>
+                    <br>
+                    <p style="text-align: left; margin: 0; font-size: 0.85em; color: #666;">
+                        <span><sup>†</sup>Equal contribution</span><br>
+                        <span><sup>‡</sup>Corresponding author</span><br>
+                    </p>
+                </div>
+
+                <div class="byline-column" style="line-height: 1.2;">
+                    <h3 style="font-size: 1.2em; margin-bottom: 0.2em;">Date</h3>
+                    <p style="margin: 0; font-size: 0.95em;">Oct 2025</p>
+                </div>
+            </div>
+        </div> -->
+
+
+
+        <!-- Teaser video: placed above the Abstract section -->
+        <div class="teaser-container">
+            <video id="co3d-grid" poster="static/teaser_frame.png" class="teaser-video rounded" autoplay loop muted controls playsinline preload="metadata">
+                <source src="static/teaser_video.mp4" type="video/mp4">
+                Your browser does not support the video tag. <a href="static/teaser_video.mp4">Download the teaser</a>.
+            </video>
+        </div>
+        <div class="teaser-caption">
+            <div class="rounded" style="text-align: center; padding-bottom: 0px; padding-top: 5px;">
+                <div style="text-align: center; color:rgb(0, 0, 0); margin-top: 10px; margin-bottom: 10px;"><strong>TL;DR</strong>: Create <i>canonically posed</i> 3D objects and <i>object-centric cameras</i> from any images in a few forward steps.</div>
+            </div>
+        </div>
+
+
+        <!-- Abstract Section -->
+        <h1 class="text">Abstract</h1>
+        <p class="text abstract">
+        We present Cupid, a new generation-based method for single-image 3D reconstruction. Our approach jointly infers camera pose, 3D shape, and texture by formulating the task as a conditional sampling process within a two-stage flow matching pipeline. This unified framework enables robust pose estimation and achieves state-of-the-art results in both geometric accuracy and visual fidelity.
+        <!-- This work proposes a new generation-based 3D reconstruction method, named <strong>Cupid</strong>, that
+        accurately infers the camera pose, 3D shape, and texture of an object from a single 2D image. Cupid casts 3D
+        reconstruction as a conditional sampling process from a learned distribution of 3D objects, and it jointly
+        generates voxels and pixel-voxel correspondences, enabling robust pose and shape estimation under a unified
+        generative framework. By representing both input camera poses and 3D shape as a distribution in a shared 3D
+        latent space, Cupid adopts a two-stage flow matching pipeline: (1) a coarse stage that produces initial 3D
+        geometry with associated 2D projections for pose recovery; and (2) a refinement stage that integrates
+        pose-aligned image features to enhance structural fidelity and appearance details. Extensive experiments
+        demonstrate Cupid outperforms leading 3D reconstruction methods with an over 3 dB PSNR gain and an over 10%
+        Chamfer Distance reduction, while matching monocular estimators on pose accuracy and delivering superior visual
+        fidelity over baseline 3D generative models. -->
+        </p> 
+
+
+
+        <!-- <div class="icon-row">
+            <a href="#visual-representation" class="icon-link">
+                <img src="static/img/icons/visual.svg" alt="Visual Representation Logo" class="icon">
+                Visual<br>Representations
+            </a>
+            <a href="#connector_design" class="icon-link">
+                <img src="static/img/icons/connector.svg" alt="Connector Logo" class="icon">
+                Connector<br>Design
+            </a>
+            <a href="#instruction_data" class="icon-link">
+                <img src="static/img/icons/data.svg" alt="Data Logo" class="icon">
+                Instruction<br>Data
+            </a>
+            <a href="#sec:inst_tuning" class="icon-link">
+                <img src="static/img/icons/recipe.svg" alt="Recipe Logo" class="icon">
+                Instruction<br>Recipes
+            </a>
+            <a href="#sec:benchmarking" class="icon-link">
+                <img src="static/img/icons/eval.svg" alt="Eval Logo" class="icon">
+                Evaluation<br>Protocol
+            </a>
+        </div>
+
+        <p class="click-hint" style="width: 85%;">
+            <img src="static/img/icons/click.gif" style="width: 1.5rem">
+            <strong>Click to jump to each section.</strong>
+        </p> -->
+        <!-- Embedded YouTube teaser (aligned to site content width) -->
+        <h1 class="text">Video</h1>
+        <div class="iframe-aligned">
+            <div class="embed-wrapper">
+                <iframe src="https://www.youtube.com/embed/S7Bqwg_q4W0" allowfullscreen
+                    style="display:block;" title="Cupid teaser video"></iframe>
+            </div>
+        </div>
+
+        <!-- <hr> -->
+        <div id='interactive_demo' class="interactive-demo-block">
+            <div id="sec:interactive_demo" class="sub-section">
+                <h1 class="text">Interactive 3D Visualization</h1>
+                <div class="rerun-container">
+                    <!-- <h3 style="text-align: center;">Interactive Results</h3> -->
+                    <div class="viewer-tip-panel" role="note" aria-label="Viewer tip" style="margin-top:0.6em; margin-bottom:22px; display:flex; justify-content:center;">
+                        <div style="max-width:840px; width:100%; background: #f0f8ff; border-left: 5px solid #7fb4ff; border-radius:10px; padding:12px 16px; box-shadow: 0 4px 12px rgba(66,133,244,0.06);">
+                            <div style="display:flex; gap:12px; align-items:flex-start;">
+                                <!-- camera icon -->
+                                <div aria-hidden="true" style="flex:0 0 36px; display:flex; align-items:center; justify-content:center;">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+                                        <rect x="2" y="6" width="20" height="14" rx="2" fill="#eaf6ff"></rect>
+                                        <path d="M8 6l1.2-2h5.6L16 6" fill="#d9f0ff"></path>
+                                        <circle cx="12" cy="13" r="3" fill="#2b6fb3"></circle>
+                                    </svg>
+                                </div>
+                                <div style="flex:1">
+                                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                                        <strong style="color:#2b6fb3; font-size:1em;">Tip</strong>
+                                        <span style="font-size:0.92em; color:#485f7a;">How to inspect camera views</span>
+                                    </div>
+                                    <p class="viewer-tip" style="margin:0; color:#23303f; font-size:0.96em; line-height:1.4;">
+                                        Double-click a camera frustum in the scene to jump to that camera's view. Then open the control panel (top-left) and use the <strong>Image Opacity</strong> slider to compare the camera image with the 3D model.
+                                        <br>
+                                        <small style="color:#657789;">Scene / multi-view examples are available at the end of the thumbnail list.</small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="viewer"></div>
+                    
+                    <div class="rerun-thumbnails" id="rerun-thumbnails">
+                        <!-- Thumbnails will be generated dynamically from recordings -->
+                    </div>
+                    
+                </div>
+            </div>
+
+            <script type="importmap">
+            {
+                "imports": {
+                    "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+                    "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+                }
+            }
+            </script>
+
+            <script type="module">
+                import { initDemoViewer } from './static/js/demo.js';
+
+                // Build thumbnailList for demo.js
+                const thumbnailList = [
+                    { metadataPath: 'static/results/david-kristianto-woqky4GR2CY-unsplash/metadata.json', thumbnail: 'static/results/david-kristianto-woqky4GR2CY-unsplash/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/maria-kovalets-o9mXWquSfk8-unsplash/metadata.json', thumbnail: 'static/results/maria-kovalets-o9mXWquSfk8-unsplash/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/mike-van-den-bos-NJUuTqckplc-unsplash/metadata.json', thumbnail: 'static/results/mike-van-den-bos-NJUuTqckplc-unsplash/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/muneeb-malhotra-IRGo0Q0-IJc-unsplash/metadata.json', thumbnail: 'static/results/muneeb-malhotra-IRGo0Q0-IJc-unsplash/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/oscar-ivan-esquivel-arteaga-at5-1nW3UCY-unsplash/metadata.json', thumbnail: 'static/results/oscar-ivan-esquivel-arteaga-at5-1nW3UCY-unsplash/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/pexels-benwithlana-lana-498258353-18714943/metadata.json', thumbnail: 'static/results/pexels-benwithlana-lana-498258353-18714943/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/pexels-kindelmedia-9026734/metadata.json', thumbnail: 'static/results/pexels-kindelmedia-9026734/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/nikhil-w5bh67zHnLc-unsplash/metadata.json', thumbnail: 'static/results/nikhil-w5bh67zHnLc-unsplash/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/pexels-berkecanavci-22729433/metadata.json', thumbnail: 'static/results/pexels-berkecanavci-22729433/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/pexels-cigdem-bilgin-2154409770-33844304/metadata.json', thumbnail: 'static/results/pexels-cigdem-bilgin-2154409770-33844304/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/pexels-ds-stories-10216074/metadata.json', thumbnail: 'static/results/pexels-ds-stories-10216074/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/pexels-eugenia-remark-5767088-17959673/metadata.json', thumbnail: 'static/results/pexels-eugenia-remark-5767088-17959673/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/pexels-franck-patras-2414987-7355365/metadata.json', thumbnail: 'static/results/pexels-franck-patras-2414987-7355365/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/pexels-ian-panelo-5786755/metadata.json', thumbnail: 'static/results/pexels-ian-panelo-5786755/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/pexels-kindelmedia-8982660/metadata.json', thumbnail: 'static/results/pexels-kindelmedia-8982660/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/pexels-markus-winkler-1430818-13572265/metadata.json', thumbnail: 'static/results/pexels-markus-winkler-1430818-13572265/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/mrushad-khombhadia-KyHmSJ1GWRQ-unsplash/metadata.json', thumbnail: 'static/results/mrushad-khombhadia-KyHmSJ1GWRQ-unsplash/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/pexels-miggy-rivera-1415514-5665104/metadata.json', thumbnail: 'static/results/pexels-miggy-rivera-1415514-5665104/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/pexels-monstera-13041008/metadata.json', thumbnail: 'static/results/pexels-monstera-13041008/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/pexels-ox-street-3848035-6050916/metadata.json', thumbnail: 'static/results/pexels-ox-street-3848035-6050916/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/pexels-paulseling-12266846/metadata.json', thumbnail: 'static/results/pexels-paulseling-12266846/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/pexels-pavel-danilyuk-6873895/metadata.json', thumbnail: 'static/results/pexels-pavel-danilyuk-6873895/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/pexels-polina-zimmerman-3747562/metadata.json', thumbnail: 'static/results/pexels-polina-zimmerman-3747562/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/pexels-shyam-mishra-31007-9546360/metadata.json', thumbnail: 'static/results/pexels-shyam-mishra-31007-9546360/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/pexels-theshuttervision-11470219/metadata.json', thumbnail: 'static/results/pexels-theshuttervision-11470219/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/aldi-sigun-pmACe385Ruo-unsplash/metadata.json', thumbnail: 'static/results/aldi-sigun-pmACe385Ruo-unsplash/images_crop/input_no_mask.png' },
+                    // { metadataPath: 'static/results/pexels-ox-street-3848035-6050911/metadata.json', thumbnail: 'static/results/pexels-ox-street-3848035-6050911/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/david-kristianto-4_vjBlYl2hY-unsplash/metadata.json', thumbnail: 'static/results/david-kristianto-4_vjBlYl2hY-unsplash/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/simon-lee-U00xWfo5yJA-unsplash/metadata.json', thumbnail: 'static/results/simon-lee-U00xWfo5yJA-unsplash/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/joseph-corl-BRThNnloBoc-unsplash/metadata.json', thumbnail: 'static/results/joseph-corl-BRThNnloBoc-unsplash/images_crop/input_no_mask.png' },
+                    
+                    // animal
+                    { metadataPath: 'static/results/william-warby-4FXlDuwgHWk-unsplash/metadata.json', thumbnail: 'static/results/william-warby-4FXlDuwgHWk-unsplash/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/ruslan-bardash-4kTbAMRAHtQ-unsplash/metadata.json', thumbnail: 'static/results/ruslan-bardash-4kTbAMRAHtQ-unsplash/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/jonnelle-yankovich-MQ4pyvRdXnY-unsplash/metadata.json', thumbnail: 'static/results/jonnelle-yankovich-MQ4pyvRdXnY-unsplash/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/karsten-winegeart-71xbJ_no56g-unsplash/metadata.json', thumbnail: 'static/results/karsten-winegeart-71xbJ_no56g-unsplash/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/devin-woody-C97we177hTs-unsplash/metadata.json', thumbnail: 'static/results/devin-woody-C97we177hTs-unsplash/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/wolfgang-hasselmann-M0K-eR-KYM8-unsplash/metadata.json', thumbnail: 'static/results/wolfgang-hasselmann-M0K-eR-KYM8-unsplash/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/danny-greenberg-8uePGgc54LY-unsplash/metadata.json', thumbnail: 'static/results/danny-greenberg-8uePGgc54LY-unsplash/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/raoul-croes-q4fxCjCj_GI-unsplash/metadata.json', thumbnail: 'static/results/raoul-croes-q4fxCjCj_GI-unsplash/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/dominik-lange-BFsm5vldl2I-unsplash/metadata.json', thumbnail: 'static/results/dominik-lange-BFsm5vldl2I-unsplash/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/thomas-evans-NVXY8_M1n40-unsplash/metadata.json', thumbnail: 'static/results/thomas-evans-NVXY8_M1n40-unsplash/images_crop/input_no_mask.png' },
+
+                    { metadataPath: 'static/results_scene/pexels-karolina-grabowska-4230630/metadata.json', thumbnail: 'static/results_scene/pexels-karolina-grabowska-4230630/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results_scene/pexels-karolina-grabowska-4464369/metadata.json', thumbnail: 'static/results_scene/pexels-karolina-grabowska-4464369/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results_scene/pexels-karolina-grabowska-7193650/metadata.json', thumbnail: 'static/results_scene/pexels-karolina-grabowska-7193650/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results_scene/pexels-ox-street-3848035-5710082/metadata.json', thumbnail: 'static/results_scene/pexels-ox-street-3848035-5710082/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results_mv/unitree/metadata.json', thumbnail: 'static/results_mv/unitree/images_crop/input_no_mask_0.png' },
+                    { metadataPath: 'static/results_mv/chair/metadata.json', thumbnail: 'static/results_mv/chair/images_crop/input_no_mask_0.png' },
+                    { metadataPath: 'static/results_mv/lego/metadata.json', thumbnail: 'static/results_mv/lego/images_crop/input_no_mask_0.png' },
+                    { metadataPath: 'static/results_mv/jimeng-2024-10-22-8493/metadata.json', thumbnail: 'static/results_mv/jimeng-2024-10-22-8493/images_crop/input_no_mask_full.png' },
+                    { metadataPath: 'static/results_mv/jimeng-2025-01-10-9662/metadata.json', thumbnail: 'static/results_mv/jimeng-2025-01-10-9662/images_crop/input_no_mask_full.png' },
+                    { metadataPath: 'static/results_mv/jimeng-2025-01-02-6562/metadata.json', thumbnail: 'static/results_mv/jimeng-2025-01-02-6562/images_crop/input_no_mask_full.png' },
+                    { metadataPath: 'static/results_mv/jimeng-2025-03-10-7566/metadata.json', thumbnail: 'static/results_mv/jimeng-2025-03-10-7566/images_crop/input_no_mask_full.png' },
+
+                ];
+                
+                // Initialize the modular Three.js viewer
+                initDemoViewer({
+                    containerId: 'viewer',
+                    galleryId: 'rerun-thumbnails',
+                    thumbnailList
+                });
+            </script>
+        </div>
+
+
+        <div id='method' class="vision-block">
+            <div id="sec:method" class="sub-section">
+                <h1 class="text">How Cupid Works?</h1>
+
+                <!-- <p class="text">
+                    Reconstructing a 3D object from a single 2D image is a classic challenge. A key difficulty is determining the camera's viewpoint. Our method, <strong>Cupid</strong>, introduces a novel solution: we don't just generate the 3D object, we <strong>jointly generate the object and its camera pose</strong> at the same time.
+                </p> -->
+                <!-- <h2 class="text">Method Overview</h2> -->
+                <p class="text">
+                    We use a powerful generative technique called Flow Model<d-cite
+                        key="lipman2022flow"></d-cite>. This model learns to transform random noise into a voxelized 3D representation, guided by the input image. To make this process efficient and effective, we break it down into two main stages<d-cite
+                        key="xiang2025structured"></d-cite>, as shown in <a href="#fig-method">Figure 1</a>.
+                </p>
+
+                <d-figure id="fig-method">
+                    <figure>
+                        <img data-zoomable="" draggable="false" src="static/img/method.png" alt="Overview of the Cupid method.">
+                        <figcaption>
+                            <strong>Figure 1: Overview of Cupid.</strong> Our two-stage process first generates a coarse shape and a novel "UV cube" to determine the camera pose. This pose then guides a second stage to generate high-fidelity geometry and appearance.
+                        </figcaption>
+                    </figure>
+                </d-figure>
+                
+                <p class="text">
+                    <strong>Stage 1: Occupancy and Pose Generation. </strong>  
+                    The first stage generates a coarse representation of the object and simultaneously estimates the camera pose. Given an input image, our flow model produces two key outputs: an occupancy cube (indicating which voxels $\mathbf{x}_i$ in space belong to the object) and a novel UV cube (indicating the 2D pixel locations $\mathbf{u}_i$ for each 3D voxel).
+                    we can robustly solve for the camera's projection matrix $\mathbf{P}^{*}$ using a classical least-squares solver<d-cite
+                        key="abdel2015direct"></d-cite>.
+                </p>
+                <p class="text" style="text-align: center;">
+                    $$
+                    \mathbf{P}^{*} = \argmin_{\mathbf{P}} \sum_{i} \big\Vert\pi(\mathbf{P},\mathbf{x}_i) - \mathbf{u}_i\big\Vert^2. \tag{1}
+                    $$
+                </p>
+
+                <p class="text">
+                    <strong>Stage 2: Pose-Aligned Geometry and Appearance Generation. </strong>
+                    With the camera pose now known, the second stage generates the fine-grained geometry and appearance. A common problem here is "color drift" and "detail inconsistency", where the 3D model doesn't perfectly match the input image's colors and details. We solve this with a <strong>pose-aligned conditioner</strong> that inject pixel-wise information.
+                </p>
+                <p class="text">
+                    For each voxel in the occupancy cube, we use the calculated pose to find exactly where it lands on the 2D input image. We then sample features (both high-level semantics from DINO and low-level color/texture) from that precise pixel location. These pixel-aligned features are injected directly into the generation process, ensuring the final 3D model has high-fidelity geometry and appearance that is faithful to the input view.
+                </p>
+                
+
+                <h2 class="text">Extension 1: Composing Components for Full Scene Reconstruction</h2>
+                <p class="text">
+                    Our framework naturally extends to reconstructing entire scenes. We use an object detector (like SAM) to find all objects in an image. Then, we run our reconstruction process on each object independently.
+                    Then, using the 3D-2D correspondences our method provides, we align each reconstructed object with a global depth prior (from a model like MoGe<d-cite
+                        key="wang2025moge"></d-cite>). This allows us to solve for each object's correct scale and position, composing them into a single, coherent 3D scene.
+                </p>
+                
+                <d-figure id="fig-scene">
+                    <figure>
+                        <img data-zoomable="" draggable="false" src="static/img/scene.png" alt="Component-aligned scene reconstruction.">
+                        <figcaption>
+                            <strong>Figure 2: Component-Aligned Scene reconstruction.</strong> By reconstructing each object and then solving for its similarity transformation, we can accurately compose complex 3D scenes.
+                        </figcaption>
+                    </figure>
+                </d-figure>
+                
+                <h2 class="text">Extension 2: Multi-view Reconstruction</h2>
+                <p class="text">
+                    Although <strong>Cupid</strong> is trained with single image condition, it can be easily extended to multi-view reconstruction, thanks to the flexibility of our generative framework.
+                    Given multiple images of the same object from different angles, we know that the 3D object cube should be the same across all views.
+                    Therefore, we can run our flow model for each image, but share the same occupancy latent $\mathbf{X}$ across all views during the iterative flow sampling. This is similar to MultiDiffusion<d-cite
+                        key="bar2023multidiffusion"></d-cite> (which average the overlapped pixel regions in 2D during iterative sampling), but in the 3D space. 
+                </p>
+
+                <d-figure id="fig-multiview">
+                    <figure>
+                        <img data-zoomable="" draggable="false" src="static/img/multiview.png" alt="Multi-view conditioning results">
+                        <figcaption>
+                            <strong>Figure 3: Multi-view conditioning.</strong> When multiple input views are available, we fuse the shared, view-agnostic object latent across flow paths (similar to MultiDiffusion<d-cite key="bar2023multidiffusion"></d-cite>), enabling camera, geometry and texture refinement across all images. <em>Top</em>: inputs; <em>Middle</em>: reconstructed 3D object and camera poses; <em>Bottom</em>: rendered images and geometry.
+                        </figcaption>
+                    </figure>
+                </d-figure>
+            </div>
+        </div>
+    </d-article>
+
+
+
+    <d-appendix>
+        <h3>BibTeX</h3>
+        <p class="bibtex">
+            @article{huang2025cupid,<br>
+                title={CUPID: Generative 3D Reconstruction via Joint Object and Pose Modeling},<br>
+                author={Huang, Binbin and Duan, Haobin and Zhao, Yiqun and Zhao, Zibo and Ma, Yi and Gao, Shenghua},<br>
+                journal={arXiv preprint arXiv:2510.20776},<br>
+                year={2025}<br>
+                }
+        </p>
+
+        <d-footnote-list></d-footnote-list>
+        <d-citation-list></d-citation-list>
+
+        <h3>Acknowledgement</h3>
+        <p>
+            We thank <a href="https://www.sainingxie.com/" target="_blank">NYU VisionX</a> for the nice project page template.
+        </p>
+    </d-appendix>
+    <!-- bibliography will be inlined during Distill pipeline's pre-rendering -->
+    <d-bibliography src="bibliography.bib"></d-bibliography>
+    <!-- <script src="./static/js/nav-bar.js"></script> -->
+</body>
+</html>

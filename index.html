@@ -3,26 +3,26 @@
 
 <head>
     <title>AGILE: Hand-object Interaction Reconstruction from Video via Agentic Generation</title>
-    <link rel="icon" type="image/x-icon" href="/static/img/icons/cupid.png">
+    <link rel="icon" type="image/x-icon" href="/static/img/icons/agile_icon.png">
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Open Graph -->
-    <meta property="og:url" content="https://cupid3d.github.io/" />
-    <meta property="og:image" content="https://cupid3d.github.io/static/img/Cupid.png" />
+    <meta property="og:url" content="https://agile.github.io/" />
+    <meta property="og:image" content="https://agile.github.io/static/img/AGILE.png" />
     <meta property="og:title" content="AGILE: Hand-object Interaction Reconstruction from Video via Agentic Generation" />
     <meta property="og:title" content="AGILE: Hand-object Interaction Reconstruction from Video via Agentic Generation" />
     <meta property="og:description"
-        content="A new generation-based 3D reconstruction method that accurately infers the camera pose, 3D shape, and texture of an object from a single 2D image." />
+        content="A framework that reconstructs simulation-ready interaction sequences from monocular video." />
 
     <!-- Twitter -->
-    <meta name="twitter:url" content="https://cupid3d.github.io/" />
+    <meta name="twitter:url" content="https://agile.github.io/" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content="https://cupid3d.github.io/static/img/Cupid.png" />
+    <meta name="twitter:image" content="https://agile.github.io/static/img/AGILE.png" />
     <meta name="twitter:title" content="AGILE: Hand-object Interaction Reconstruction from Video via Agentic Generation" />
     <meta name="twitter:description"
-        content="A new generation-based 3D reconstruction method that accurately infers the camera pose, 3D shape, and texture of an object from a single 2D image." />
+        content="A framework that reconstructs simulation-ready interaction sequences from monocular video." />
 
     <script src="./static/js/distill_template.v2.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -85,68 +85,69 @@
         <div class="header-container" id="header-container">
             <div class="header-content">
                 <h1 style="margin-top: 0px">AGILE</h1>
-                <h2>Hand-object Interaction Reconstruction from Video via
-                    Agentic Generation</h2>
+                <h2>Hand-object Interaction Reconstruction from Video via Agentic Generation</h2>
                 <p>
                     Introducing AGILE, a framework that reconstructs simulation-ready interaction
                     sequences from monocular video.
                 </p>
 
-                <!-- <div class="icon-container">
+                <div class="icon-container">
                     <div class="icon-item">
                         <img src="./static/img/icons/formula.svg" alt="Visual Representation Icon">
-                        <div><strong>Novel Generative Formulation</strong>: We reframe 3D reconstruction by jointly
-                            synthesizing the object and its camera pose. This grounds the generation process, creating
-                            an explicit link between the 3D output and the 2D input view.
+                        <div><strong>Novel Generativion Pipeline</strong>: propose the first agentic HOI pipeline that integrates
+                            VLM-guided quality assessment with generative models,
+                            enabling the production of high-fidelity, watertight meshes
+                            independent of video occlusions. 
                         </div>
                     </div>
                     <div class="icon-item">
                         <img src="./static/img/icons/camera.svg" alt="Connector Design Icon">
-                        <div><strong>Pose-Conditioned Architecture</strong>: We design a generator with a pose-aligned
-                            conditioner. This novel mechanism directly injects <em>pixel information</em> into the
-                            synthesis
-                            process to prevent color drift and ensure textural fidelity.
+                        <div><strong>Robust Optimization Strategy</strong>: we introduce
+                            a robust anchor-and-track optimization strategy that elim-
+                            inates the dependency on brittle SfM by anchoring pose
+                            initialization at a single contact frame and propagating it
+                            via semantic and geometric alignment.
                         </div>
                     </div>
                     <div class="icon-item">
                         <img src="./static/img/icons/cube.svg" alt="Instruction Tuning Data Icon">
-                        <div><strong>Unified and Versatile Model</strong>: Our approach is a unified, versatile model
-                            that
-                            excels at diverse 3D synthesis tasks, including <em>single image reconstruction</em>, <em>scene
-                                generation</em>, and <em>multi-view reconstruction</em>, without task-specific tuning.
+                        <div><strong>Physics-Aware Constraints</strong>: We incorporate
+                            physics-aware constraints to strictly enforce interaction stability
+                            and prevent penetration
                             </p>
                         </div>
                     </div>
-                </div> -->
+                </div>
 
             </div>
             <!-- header image (intentionally left blank; teaser video placed above Abstract) -->
             <!-- <div class="header-image">
-                <img draggable="false" src="static/img/Cupid.png" alt="Teaser Image" class="teaser-image">
+                <img draggable="false" src="static/img/AGILE.png" alt="Teaser Image" class="teaser-image">
             </div> -->
         </div>
     </div>
     <d-article>
 
-        <!-- Teaser video: placed above the Abstract section -->
-        <div class="teaser-container">
-            <video id="agile-demo" poster="static/AGILE_teaser_frame.png" class="teaser-video rounded" autoplay loop muted controls playsinline preload="metadata">
-                <source src="static/AGILE_video.mp4" type="video/mp4">
-                Your browser does not support the video tag. <a href="static/AGILE_video.mp4">Download the teaser</a>.
-            </video>
-        </div>
         <div class="teaser-caption">
             <div class="rounded" style="text-align: center; padding-bottom: 0px; padding-top: 5px;">
                 <div style="text-align: center; color:rgb(0, 0, 0); margin-top: 10px; margin-bottom: 10px;"><strong>TL;DR</strong>: Create <i>canonically posed</i> 3D objects and <i>object-centric cameras</i> from any images in a few forward steps.</div>
             </div>
         </div>
 
-
         <!-- Abstract Section -->
         <h1 class="text">Abstract</h1>
         <p class="text abstract">
         Reconstructing dynamic hand-object interactions from monocular videos is critical for dexterous manipulation data collection and creating realistic digital twins for robotics and VR. However, current methods face two prohibitive barriers: (1) reliance on neural rendering often yields fragmented, non-simulation-ready geometries under heavy occlusion, and (2) dependence on brittle Structure-from-Motion (SfM) initialization leads to frequent failures on in-the-wild footage. To overcome these limitations, we introduce AGILE, a robust framework that shifts the paradigm from reconstruction to agentic generation for interaction learning. First, we employ an agentic pipeline where a Vision-Language Model (VLM) guides a generative model to synthesize a complete, watertight object mesh with high-fidelity texture, independent of video occlusions. Second, bypassing fragile SfM entirely, we propose a robust anchor-and-track strategy. We initialize the object pose at a single interaction onset frame using a foundation model and propagate it temporally by leveraging the strong visual similarity between our generated asset and video observations. Finally, a contact-aware optimization integrates semantic, geometric, and interaction stability constraints to enforce physical plausibility. Extensive experiments on HO3D, DexYCB, and in-the-wild videos reveal that AGILE outperforms baselines in global geometric accuracy while demonstrating exceptional robustness on challenging sequences where prior arts frequently collapse. By prioritizing physical validity, our method produces simulation-ready assets validated via real-to-sim retargeting for robotic applications.
         </p> 
+
+        <!-- Demo video
+        <h1 class="text">Demo Video</h1>
+        <div class="teaser-container">
+            <video id="agile-demo" poster="static/AGILE_teaser_frame.png" class="teaser-video rounded" autoplay loop muted controls playsinline preload="metadata">
+                <source src="static/AGILE_video.mp4" type="video/mp4">
+                Your browser does not support the video tag. <a href="static/AGILE_video.mp4">Download the teaser</a>.
+            </video>
+        </div> -->
 
         <!-- <hr> -->
         <div id='interactive_demo' class="interactive-demo-block">
@@ -171,7 +172,7 @@
                                         <span style="font-size:0.92em; color:#485f7a;">How to inspect camera views</span>
                                     </div>
                                     <p class="viewer-tip" style="margin:0; color:#23303f; font-size:0.96em; line-height:1.4;">
-                                        Double-click a camera frustum in the scene to jump to that camera's view. Then open the control panel (top-left) and use the <strong>Image Opacity</strong> slider to compare the camera image with the 3D model.
+                                        Double-click to reset the view. Then open the control panel (top-left) and use the <strong>Image Opacity</strong> slider to compare the camera image with the 3D model.
                                         <br>
                                         <small style="color:#657789;">Scene / multi-view examples are available at the end of the thumbnail list.</small>
                                     </p>
@@ -201,62 +202,14 @@
                 import { initDemoViewer } from './static/js/demo.js';
 
                 // Build thumbnailList for demo.js
+                // 这里是所有 results 的列表
                 const thumbnailList = [
-                    { metadataPath: 'static/results/david-kristianto-woqky4GR2CY-unsplash/metadata.json', thumbnail: 'static/results/david-kristianto-woqky4GR2CY-unsplash/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/maria-kovalets-o9mXWquSfk8-unsplash/metadata.json', thumbnail: 'static/results/maria-kovalets-o9mXWquSfk8-unsplash/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/mike-van-den-bos-NJUuTqckplc-unsplash/metadata.json', thumbnail: 'static/results/mike-van-den-bos-NJUuTqckplc-unsplash/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/muneeb-malhotra-IRGo0Q0-IJc-unsplash/metadata.json', thumbnail: 'static/results/muneeb-malhotra-IRGo0Q0-IJc-unsplash/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/oscar-ivan-esquivel-arteaga-at5-1nW3UCY-unsplash/metadata.json', thumbnail: 'static/results/oscar-ivan-esquivel-arteaga-at5-1nW3UCY-unsplash/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/pexels-benwithlana-lana-498258353-18714943/metadata.json', thumbnail: 'static/results/pexels-benwithlana-lana-498258353-18714943/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/pexels-kindelmedia-9026734/metadata.json', thumbnail: 'static/results/pexels-kindelmedia-9026734/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/nikhil-w5bh67zHnLc-unsplash/metadata.json', thumbnail: 'static/results/nikhil-w5bh67zHnLc-unsplash/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/pexels-berkecanavci-22729433/metadata.json', thumbnail: 'static/results/pexels-berkecanavci-22729433/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/pexels-cigdem-bilgin-2154409770-33844304/metadata.json', thumbnail: 'static/results/pexels-cigdem-bilgin-2154409770-33844304/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/pexels-ds-stories-10216074/metadata.json', thumbnail: 'static/results/pexels-ds-stories-10216074/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/pexels-eugenia-remark-5767088-17959673/metadata.json', thumbnail: 'static/results/pexels-eugenia-remark-5767088-17959673/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/pexels-franck-patras-2414987-7355365/metadata.json', thumbnail: 'static/results/pexels-franck-patras-2414987-7355365/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/pexels-ian-panelo-5786755/metadata.json', thumbnail: 'static/results/pexels-ian-panelo-5786755/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/pexels-kindelmedia-8982660/metadata.json', thumbnail: 'static/results/pexels-kindelmedia-8982660/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/pexels-markus-winkler-1430818-13572265/metadata.json', thumbnail: 'static/results/pexels-markus-winkler-1430818-13572265/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/mrushad-khombhadia-KyHmSJ1GWRQ-unsplash/metadata.json', thumbnail: 'static/results/mrushad-khombhadia-KyHmSJ1GWRQ-unsplash/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/pexels-miggy-rivera-1415514-5665104/metadata.json', thumbnail: 'static/results/pexels-miggy-rivera-1415514-5665104/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/pexels-monstera-13041008/metadata.json', thumbnail: 'static/results/pexels-monstera-13041008/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/pexels-ox-street-3848035-6050916/metadata.json', thumbnail: 'static/results/pexels-ox-street-3848035-6050916/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/pexels-paulseling-12266846/metadata.json', thumbnail: 'static/results/pexels-paulseling-12266846/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/pexels-pavel-danilyuk-6873895/metadata.json', thumbnail: 'static/results/pexels-pavel-danilyuk-6873895/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/pexels-polina-zimmerman-3747562/metadata.json', thumbnail: 'static/results/pexels-polina-zimmerman-3747562/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/pexels-shyam-mishra-31007-9546360/metadata.json', thumbnail: 'static/results/pexels-shyam-mishra-31007-9546360/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/pexels-theshuttervision-11470219/metadata.json', thumbnail: 'static/results/pexels-theshuttervision-11470219/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/aldi-sigun-pmACe385Ruo-unsplash/metadata.json', thumbnail: 'static/results/aldi-sigun-pmACe385Ruo-unsplash/images_crop/input_no_mask.png' },
-                    // { metadataPath: 'static/results/pexels-ox-street-3848035-6050911/metadata.json', thumbnail: 'static/results/pexels-ox-street-3848035-6050911/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/david-kristianto-4_vjBlYl2hY-unsplash/metadata.json', thumbnail: 'static/results/david-kristianto-4_vjBlYl2hY-unsplash/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/simon-lee-U00xWfo5yJA-unsplash/metadata.json', thumbnail: 'static/results/simon-lee-U00xWfo5yJA-unsplash/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/joseph-corl-BRThNnloBoc-unsplash/metadata.json', thumbnail: 'static/results/joseph-corl-BRThNnloBoc-unsplash/images_crop/input_no_mask.png' },
+                    // { metadataPath: 'static/results/david-kristianto-woqky4GR2CY-unsplash/metadata.json', thumbnail: 'static/results/david-kristianto-woqky4GR2CY-unsplash/images_crop/input_no_mask.png' },
+                    // { metadataPath: 'static/results/maria-kovalets-o9mXWquSfk8-unsplash/metadata.json', thumbnail: 'static/results/maria-kovalets-o9mXWquSfk8-unsplash/images_crop/input_no_mask.png' },
+                    { metadataPath: 'static/results/SM2/metadata.json', thumbnail: 'static/results/SM2/thumbnail.png' },
+                    { metadataPath: 'static/results/GSF13/metadata.json', thumbnail: 'static/results/GSF13/thumbnail.png' },
+                    { metadataPath: 'static/results/ABF12/metadata.json', thumbnail: 'static/results/ABF12/thumbnail.png' },
                     
-                    // animal
-                    { metadataPath: 'static/results/william-warby-4FXlDuwgHWk-unsplash/metadata.json', thumbnail: 'static/results/william-warby-4FXlDuwgHWk-unsplash/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/ruslan-bardash-4kTbAMRAHtQ-unsplash/metadata.json', thumbnail: 'static/results/ruslan-bardash-4kTbAMRAHtQ-unsplash/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/jonnelle-yankovich-MQ4pyvRdXnY-unsplash/metadata.json', thumbnail: 'static/results/jonnelle-yankovich-MQ4pyvRdXnY-unsplash/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/karsten-winegeart-71xbJ_no56g-unsplash/metadata.json', thumbnail: 'static/results/karsten-winegeart-71xbJ_no56g-unsplash/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/devin-woody-C97we177hTs-unsplash/metadata.json', thumbnail: 'static/results/devin-woody-C97we177hTs-unsplash/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/wolfgang-hasselmann-M0K-eR-KYM8-unsplash/metadata.json', thumbnail: 'static/results/wolfgang-hasselmann-M0K-eR-KYM8-unsplash/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/danny-greenberg-8uePGgc54LY-unsplash/metadata.json', thumbnail: 'static/results/danny-greenberg-8uePGgc54LY-unsplash/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/raoul-croes-q4fxCjCj_GI-unsplash/metadata.json', thumbnail: 'static/results/raoul-croes-q4fxCjCj_GI-unsplash/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/dominik-lange-BFsm5vldl2I-unsplash/metadata.json', thumbnail: 'static/results/dominik-lange-BFsm5vldl2I-unsplash/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results/thomas-evans-NVXY8_M1n40-unsplash/metadata.json', thumbnail: 'static/results/thomas-evans-NVXY8_M1n40-unsplash/images_crop/input_no_mask.png' },
-
-                    { metadataPath: 'static/results_scene/pexels-karolina-grabowska-4230630/metadata.json', thumbnail: 'static/results_scene/pexels-karolina-grabowska-4230630/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results_scene/pexels-karolina-grabowska-4464369/metadata.json', thumbnail: 'static/results_scene/pexels-karolina-grabowska-4464369/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results_scene/pexels-karolina-grabowska-7193650/metadata.json', thumbnail: 'static/results_scene/pexels-karolina-grabowska-7193650/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results_scene/pexels-ox-street-3848035-5710082/metadata.json', thumbnail: 'static/results_scene/pexels-ox-street-3848035-5710082/images_crop/input_no_mask.png' },
-                    { metadataPath: 'static/results_mv/unitree/metadata.json', thumbnail: 'static/results_mv/unitree/images_crop/input_no_mask_0.png' },
-                    { metadataPath: 'static/results_mv/chair/metadata.json', thumbnail: 'static/results_mv/chair/images_crop/input_no_mask_0.png' },
-                    { metadataPath: 'static/results_mv/lego/metadata.json', thumbnail: 'static/results_mv/lego/images_crop/input_no_mask_0.png' },
-                    { metadataPath: 'static/results_mv/jimeng-2024-10-22-8493/metadata.json', thumbnail: 'static/results_mv/jimeng-2024-10-22-8493/images_crop/input_no_mask_full.png' },
-                    { metadataPath: 'static/results_mv/jimeng-2025-01-10-9662/metadata.json', thumbnail: 'static/results_mv/jimeng-2025-01-10-9662/images_crop/input_no_mask_full.png' },
-                    { metadataPath: 'static/results_mv/jimeng-2025-01-02-6562/metadata.json', thumbnail: 'static/results_mv/jimeng-2025-01-02-6562/images_crop/input_no_mask_full.png' },
-                    { metadataPath: 'static/results_mv/jimeng-2025-03-10-7566/metadata.json', thumbnail: 'static/results_mv/jimeng-2025-03-10-7566/images_crop/input_no_mask_full.png' },
-
                 ];
                 
                 // Initialize the modular Three.js viewer
@@ -271,7 +224,7 @@
 
         <div id='method' class="vision-block">
             <div id="sec:method" class="sub-section">
-                <h1 class="text">How Cupid Works?</h1>
+                <h1 class="text">How AGILE Works?</h1>
 
                 <!-- <p class="text">
                     Reconstructing a 3D object from a single 2D image is a classic challenge. A key difficulty is determining the camera's viewpoint. Our method, <strong>Cupid</strong>, introduces a novel solution: we don't just generate the 3D object, we <strong>jointly generate the object and its camera pose</strong> at the same time.
@@ -282,15 +235,6 @@
                         key="lipman2022flow"></d-cite>. This model learns to transform random noise into a voxelized 3D representation, guided by the input image. To make this process efficient and effective, we break it down into two main stages<d-cite
                         key="xiang2025structured"></d-cite>, as shown in <a href="#fig-method">Figure 1</a>.
                 </p>
-
-                <d-figure id="fig-method">
-                    <figure>
-                        <img data-zoomable="" draggable="false" src="static/img/method.png" alt="Overview of the Cupid method.">
-                        <figcaption>
-                            <strong>Figure 1: Overview of Cupid.</strong> Our two-stage process first generates a coarse shape and a novel "UV cube" to determine the camera pose. This pose then guides a second stage to generate high-fidelity geometry and appearance.
-                        </figcaption>
-                    </figure>
-                </d-figure>
                 
                 <p class="text">
                     <strong>Stage 1: Occupancy and Pose Generation. </strong>  
@@ -304,6 +248,15 @@
                     $$
                 </p>
 
+                                <d-figure id="fig-method">
+                    <figure>
+                        <img data-zoomable="" draggable="false" src="static/img/agentic_gen.png" alt="Pipeline for Agentic Textured Object Generation.">
+                        <figcaption>
+                            <strong>Figure 1: Overview of Agentic Textured Object Generation.</strong> A VLM agent first selects informative keyframes from the input video to guide multi-view synthesis. To ensure consistency, a VLM-based critic filters the generated views via rejection sampling. The validated images are then lifted to 3D, followed by automated topology optimization and texture refinement. As highlighted in the bottom-right comparison, this refinement step significantly enhances texture fidelity against the evaluated multi-views, yielding a high-quality, simulation-ready asset.
+                        </figcaption>
+                    </figure>
+                </d-figure>
+
                 <p class="text">
                     <strong>Stage 2: Pose-Aligned Geometry and Appearance Generation. </strong>
                     With the camera pose now known, the second stage generates the fine-grained geometry and appearance. A common problem here is "color drift" and "detail inconsistency", where the 3D model doesn't perfectly match the input image's colors and details. We solve this with a <strong>pose-aligned conditioner</strong> that inject pixel-wise information.
@@ -311,6 +264,16 @@
                 <p class="text">
                     For each voxel in the occupancy cube, we use the calculated pose to find exactly where it lands on the 2D input image. We then sample features (both high-level semantics from DINO and low-level color/texture) from that precise pixel location. These pixel-aligned features are injected directly into the generation process, ensuring the final 3D model has high-fidelity geometry and appearance that is faithful to the input view.
                 </p>
+
+                <d-figure id="fig-method">
+                    <figure>
+                        <img data-zoomable="" draggable="false" src="static/img/pipeline.png" alt="Overview of the Cupid method.">
+                        <figcaption>
+                            <strong>Figure 2: Overview of Cupid.</strong> Our two-stage process first generates a coarse shape and a novel "UV cube" to determine the camera pose. This pose then guides a second stage to generate high-fidelity geometry and appearance.
+                        </figcaption>
+                    </figure>
+                </d-figure>
+                
                 
 
                 <h2 class="text">Extension 1: Composing Components for Full Scene Reconstruction</h2>
@@ -367,7 +330,7 @@
 
         <h3>Acknowledgement</h3>
         <p>
-            We thank <a href="https://www.sainingxie.com/" target="_blank">NYU VisionX</a> for the nice project page template.
+            We thank <a href="https://www.sainingxie.com/" target="_blank">NYU VisionX</a> and <a href="https://agile.github.io/" target="_blank">Cupid</a> for the nice project page template.
         </p>
     </d-appendix>
     <!-- bibliography will be inlined during Distill pipeline's pre-rendering -->
