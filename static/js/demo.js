@@ -12,7 +12,7 @@ let currentImage = null;
 let cameraFrustums = [];
 let currentHoveredFrustum = null;
 let currentHoveredMesh = null;
-let imageOpacity = 1.0; // Global image opacity state
+let imageOpacity = 0.5; // Global image opacity state
 // Token to identify the latest requested load; incrementing cancels prior loads logically
 let _currentLoadToken = 0;
 
@@ -29,8 +29,10 @@ let handMeshesDir = null;
 let videoFramesDir = null;
 let videoFrames = [];
 let currentVideoFrameIndex = 0;
+let isAnimationPaused = false;
+let maxFrameIndex = null;
 
-const global_scale = 10.0;
+const global_scale = 4.0;
 
 // --- Control Panel Functions ---
 function createControlPanel(containerId) {
@@ -48,6 +50,7 @@ function createControlPanel(containerId) {
     controlPanel.innerHTML = `
         <div class="control-header">
             <h3>🎮 Control</h3>
+            <button id="togglePlayBtn" class="control-toggle play-pause-btn" title="Pause animation" style="margin-right: 8px;">⏸️</button>
             <button id="controlPanelToggle" class="control-toggle" title="Expand">+</button>
         </div>
 
@@ -58,23 +61,41 @@ function createControlPanel(containerId) {
         </div>
 
         <div class="control-section">
-            <h4>🔘 Buttons</h4>
+            <h4>🎞️ Video Frames</h4>
             <div class="actions-row actions-row-two" style="display:flex; flex-direction:column; gap:6px;">
-                <div class="actions-row-top" style="display:flex; gap:8px; align-items:center;">
-                    <button id="resetViewBtn" class="action-button" aria-label="Reset view">🏠 <span class="action-text">Reset</span></button>
+                <div class="actions-row-top" style="display:flex; gap:8px; align-items:center;">    
+                    <button id="previousFrameBtn" class="action-button" title="Previous frame" aria-label="Previous frame">◁ <span class="action-text">Prev</span></button>
+                    <button id="nextFrameBtn" class="action-button" title="Next frame" aria-label="Next frame">▷ <span class="action-text">Next</span></button>
                 </div>
                 <div class="actions-row-bottom" style="display:flex; gap:8px; align-items:center;">
+                    <button id="firstFrameBtn" class="action-button" title="First frame" aria-label="First frame">⏮️<span class="action-text">First</span></button>
+                    <button id="lastFrameBtn" class="action-button" title="Last frame" aria-label="Last frame">⏭️<span class="action-text">Last</span></button>
+                </div>
+            </div>
+            <div class="control-label">Frame Index: <span id="frameIndexValue">0</span></div>
+            <input type="range" id="frameIndexSlider" min="0" max="100" value="0" class="control-range">
+        </div>
+
+        <div class="control-section">
+            <h4>📷 Camera Control</h4>
+            <div class="actions-row actions-row-two" style="display:flex; flex-direction:column; gap:6px;">
+                <div class="actions-frames" style="display:flex; gap:8px; align-items:center;">
+                    <button id="resetViewBtn" class="action-button" aria-label="Reset view">🏠 <span class="action-text">Reset</span></button>
+                    <button id="toggleFrustumBtn" class="action-button" title="Toggle camera frustum" aria-label="Toggle camera frustum">📷 <span class="action-text">Frustum</span></button>
+                </div>
+                <div class="actions-frames-jump" style="display:flex; gap:8px; align-items:center;">
                     <button id="toggleAutoRotateBtn" class="action-button" title="Toggle auto-rotate" aria-label="Toggle auto-rotate">🔁 <span class="action-text">Spin</span></button>
-                    <button id="toggleFullscreenBtn" class="action-button" title="Toggle fullscreen" aria-label="Toggle fullscreen" style="color: #2b6fb3;">⤢ <span class="action-text">Full</span></button>
+                    <button id="toggleFullscreenBtn" class="action-button" title="Toggle fullscreen" aria-label="Toggle fullscreen">⤢ <span class="action-text">Full</span></button>
                 </div>
             </div>
         </div>
 
         <div class="control-section">
             <h4>🎨 Image</h4>
-            <div class="control-label">Opacity: <span id="opacityValue">100%</span></div>
-            <input type="range" id="imageOpacitySlider" min="0" max="100" value="100" class="control-range">
+            <div class="control-label">Opacity: <span id="opacityValue">50%</span></div>
+            <input type="range" id="imageOpacitySlider" min="0" max="100" value="50" class="control-range">
         </div>
+        
     `;
     // Insert panel into the viewer container so it participates in the viewer's local stacking/layout
     // and is not affected by global forcing rules. Container is positioned relative in initDemoViewer.
@@ -137,32 +158,141 @@ function setupControlPanelEvents() {
     //     });
     // }
 
+    // Play/Pause Button
+    const togglePlayBtn = document.getElementById('togglePlayBtn');
+    if (togglePlayBtn) {
+        const updatePlayButton = () => {
+            togglePlayBtn.textContent = isAnimationPaused ? '▶️' : '⏸️';
+            togglePlayBtn.title = isAnimationPaused ? 'Play animation' : 'Pause animation';
+        };
+        togglePlayBtn.addEventListener('click', () => {
+            isAnimationPaused = !isAnimationPaused;
+            updatePlayButton();
+        });
+        updatePlayButton();
+    }
+
+    // Frame Index Slider
+    const frameIndexSlider = document.getElementById('frameIndexSlider');
+    const frameIndexValue = document.getElementById('frameIndexValue');
+
+    if (frameIndexSlider && frameIndexValue) {
+        // 初始化显示
+        frameIndexValue.textContent = '0/0';
+        
+        // 初始化时禁用滑块（播放状态）
+        frameIndexSlider.disabled = !isAnimationPaused;
+        
+        // 更新滑块状态的辅助函数
+        const updateFrameSliderState = () => {
+            frameIndexSlider.disabled = !isAnimationPaused;
+            frameIndexSlider.style.opacity = isAnimationPaused ? '1' : '0.4';
+            frameIndexSlider.style.cursor = isAnimationPaused ? 'pointer' : 'not-allowed';
+        };
+        
+        // 监听播放/暂停按钮点击，更新滑块状态
+        const togglePlayBtn = document.getElementById('togglePlayBtn');
+        if (togglePlayBtn) {
+            const originalHandler = togglePlayBtn.onclick;
+            togglePlayBtn.onclick = function() {
+                if (originalHandler) originalHandler.call(this);
+                setTimeout(updateFrameSliderState, 0);
+            };
+        }
+        
+        // 监听滑块变化
+        frameIndexSlider.addEventListener('input', (e) => {
+            if (!isAnimationPaused || !objectPoses) return;
+            
+            const value = parseInt(e.target.value);
+            const totalFrames = objectPoses.length;
+            const frameIndex = Math.floor((value / 100) * (totalFrames - 1));
+            
+            // 更新当前帧索引
+            currentFrameIndex = frameIndex;
+            
+            // 更新显示文本（从1开始计数，更符合用户习惯）
+            frameIndexValue.textContent = `${frameIndex + 1}/${totalFrames}`;
+            
+            // 立即更新场景
+            updateFrame();
+        });
+        
+        // 初始化滑块状态
+        updateFrameSliderState();
+    }
+
+    // Frame Control Buttons
+    const prevFrameButton = document.getElementById('previousFrameBtn');
+    if (prevFrameButton) {
+        prevFrameButton.addEventListener('click', () => {
+            if (!objectPoses) return;
+            currentFrameIndex = Math.max(0, currentFrameIndex - 1);
+            updateFrame();
+            frameIndexSlider.value = (currentFrameIndex / (objectPoses.length - 1)) * 100;
+            frameIndexValue.textContent = `${currentFrameIndex + 1}/${objectPoses.length}`;
+        });
+    }
+    const nextFrameButton = document.getElementById('nextFrameBtn');
+    if (nextFrameButton) {
+        nextFrameButton.addEventListener('click', () => {
+            if (!objectPoses) return;
+            currentFrameIndex = Math.min(objectPoses.length - 1, currentFrameIndex + 1);
+            updateFrame();
+            frameIndexSlider.value = (currentFrameIndex / (objectPoses.length - 1)) * 100;
+            frameIndexValue.textContent = `${currentFrameIndex + 1}/${objectPoses.length}`;
+        });
+    }
+    const firstFrameButton = document.getElementById('firstFrameBtn');
+    if (firstFrameButton) {
+        firstFrameButton.addEventListener('click', () => {
+            if (!objectPoses) return;
+            currentFrameIndex = 0;
+            updateFrame();
+            frameIndexSlider.value = 0;
+            frameIndexValue.textContent = `1/${objectPoses.length}`;
+        });
+    }
+    const lastFrameButton = document.getElementById('lastFrameBtn');
+    if (lastFrameButton) {
+        lastFrameButton.addEventListener('click', () => {
+            if (!objectPoses) return;
+            currentFrameIndex = objectPoses.length - 1;
+            updateFrame();
+            frameIndexSlider.value = 100;
+            frameIndexValue.textContent = `${objectPoses.length}/${objectPoses.length}`;
+        });
+    }
+
     // Reset View Button
     const resetViewBtn = document.getElementById('resetViewBtn');
     if (resetViewBtn) {
         resetViewBtn.addEventListener('click', () => {
             controls.autoRotate = false;
+            
+            // 保存原始的内参（viewOffset）
+            const originalViewOffset = camera.view ? {
+                fullWidth: camera.view.fullWidth,
+                fullHeight: camera.view.fullHeight,
+                offsetX: camera.view.offsetX,
+                offsetY: camera.view.offsetY,
+                width: camera.view.width,
+                height: camera.view.height
+            } : null;
+            
             const startPos = camera.position.clone();
             const startQuat = camera.quaternion.clone();
             const startFov = camera.fov;
-            // const endPos = new THREE.Vector3(3, 3, 3);
             const endPos = new THREE.Vector3(0, 0, 0);
-
-            // let targetCenter = new THREE.Vector3(0, 1, 0);
-            // if (currentModel) {
-            //     let bbox = new THREE.Box3().setFromObject(currentModel);
-            //     targetCenter = bbox.getCenter(new THREE.Vector3());
-            // }
-            let targetCenter = initObjectPosition.clone();
 
             const tempCam = new THREE.PerspectiveCamera(75, camera.aspect, camera.near, camera.far);
             tempCam.position.copy(endPos);
             tempCam.up.set(0, 1, 0);
             // tempCam.lookAt(targetCenter);
             tempCam.lookAt(0, 0, -1);
-            controls.target.copy(targetCenter);
+            controls.target.set(0, 0, initObjectPosition.z);
             const endQuat = tempCam.quaternion.clone();
-            const endFov = 75;
+            const endFov = camera.fov;
             
             animateClientCamera(startPos, startQuat, startFov, endPos, endQuat, endFov);
 
@@ -171,12 +301,53 @@ function setupControlPanelEvents() {
                 camera.quaternion.copy(endQuat);
                 camera.fov = endFov;
                 camera.up.set(0, 1, 0);
+
                 camera.updateProjectionMatrix();
-                controls.target.copy(targetCenter);
+                controls.target.set(0, 0, initObjectPosition.z);
                 controls.object.up.set(0, 1, 0);
                 controls.update();
+
+                // 📊 Log camera state
+                console.log('📊 Reset Camera State:', {
+                    position: `(${camera.position.x.toFixed(3)}, ${camera.position.y.toFixed(3)}, ${camera.position.z.toFixed(3)})`,
+                    target: `(${controls.target.x.toFixed(3)}, ${controls.target.y.toFixed(3)}, ${controls.target.z.toFixed(3)})`,
+                    fov: camera.fov.toFixed(2) + '°',
+                    aspect: camera.aspect.toFixed(3),
+                    viewOffset: camera.view ? {
+                        offsetX: camera.view.offsetX.toFixed(2),
+                        offsetY: camera.view.offsetY.toFixed(2),
+                        fullWidth: camera.view.fullWidth,
+                        fullHeight: camera.view.fullHeight
+                    } : 'none'
+                });
+
             }, 850);
         });
+    }
+
+    const toggleFrustumBtn = document.getElementById('toggleFrustumBtn');
+    if (toggleFrustumBtn) {
+        const updateFrustumButton = () => {
+            if (cameraFrustums.length === 0) return;
+            const on = cameraFrustums[0].visible;
+            toggleFrustumBtn.classList.toggle('active', on);
+            toggleFrustumBtn.classList.toggle('inactive', !on);
+            toggleFrustumBtn.title = on ? 'Hide camera frustum' : 'Show camera frustum';
+        };
+        toggleFrustumBtn.addEventListener('click', () => {
+            if (cameraFrustums.length === 0) return;
+            const newVisibility = !cameraFrustums[0].visible;
+            cameraFrustums.forEach(frustum => {
+                frustum.visible = newVisibility;
+                // 同时切换相机对象的可见性
+                if (frustum.userData.camera) {
+                    frustum.userData.camera.visible = newVisibility;
+                }
+            });
+            updateFrustumButton();
+        });
+        // 初始状态设为可见
+        setTimeout(() => updateFrustumButton(), 100);
     }
 
     // Axes Toggle (emoji button)
@@ -314,6 +485,75 @@ function setupControlPanelEvents() {
                         if (sliderLabel) sliderLabel.setAttribute('aria-hidden', 'true');
             }
         });
+    }
+}
+
+// 手动更新帧的函数（在暂停时拖动滑块时调用）
+function updateFrame() {
+    if (!objectPoses || !currentModel || handMeshes.length === 0 || videoFrames.length === 0 || cameraFrustums.length === 0) {
+        return;
+    }
+    
+    // 获取当前帧的变换矩阵
+    const poseMatrix = objectPoses[currentFrameIndex];
+    
+    // 处理嵌套数组格式
+    const flatPose = poseMatrix.map(row => {
+        if (Array.isArray(row)) {
+            if (row.length === 1) return [row[0], 0, 0, 0];
+            if (row.length === 0) return [0, 0, 0, 1];
+            return row;
+        }
+        return [row, 0, 0, 0];
+    });
+    
+    // 构建姿态矩阵
+    const poseGL = new THREE.Matrix4().set(
+        flatPose[0][0], flatPose[0][1], flatPose[0][2], flatPose[0][3] * global_scale,
+        flatPose[1][0], flatPose[1][1], flatPose[1][2], flatPose[1][3] * global_scale,
+        flatPose[2][0], flatPose[2][1], flatPose[2][2], flatPose[2][3] * global_scale,
+        flatPose[3][0], flatPose[3][1], flatPose[3][2], flatPose[3][3]
+    );
+    
+    // 分解矩阵
+    const position = new THREE.Vector3();
+    const quaternion = new THREE.Quaternion();
+    const scale = new THREE.Vector3();
+    poseGL.decompose(position, quaternion, scale);
+    
+    // 更新物体位置和姿态
+    currentModel.scale.set(global_scale, global_scale, global_scale);
+    currentModel.position.copy(position);
+    currentModel.quaternion.copy(quaternion);
+    
+    // 更新手部网格
+    if (handMeshesDir && handMeshes.length > 0) {
+        if (currentHandMesh) {
+            currentHandMesh.visible = false;
+        }
+        currentHandMesh = handMeshes[currentFrameIndex];
+        if (currentHandMesh) {
+            currentHandMesh.visible = true;
+        }
+    }
+    
+    // 更新相机视锥体上的图片纹理
+    if (videoFrames.length > 0 && cameraFrustums.length > 0) {
+        const currentTexture = videoFrames[currentFrameIndex];
+        if (currentTexture) {
+            cameraFrustums.forEach(frustum => {
+                const cam = frustum.userData.camera;
+                if (cam && cam.children && cam.children.length > 0) {
+                    const imagePlane = cam.children.find(child => 
+                        child.userData && child.userData.isImagePlane && child.isMesh
+                    );
+                    if (imagePlane && imagePlane.material) {
+                        imagePlane.material.map = currentTexture;
+                        imagePlane.material.needsUpdate = true;
+                    }
+                }
+            });
+        }
     }
 }
 
@@ -459,8 +699,6 @@ export function initDemoViewer({ containerId = 'viewer', galleryId = 'thumbnailG
     axesGroup.visible = false;
     scene.add(axesGroup);
 
-    // camera.position.set(-2, 2, -2);
-    // controls.target.set(0, 0, 0);
     camera.position.set(0, 0, 0);  // ← 位置在原点
     camera.up.set(0, 1, 0);        // ← Y 轴向上
     camera.lookAt(0, 0, -1);       // ← 朝向 -Z 方向
@@ -531,6 +769,16 @@ export function initDemoViewer({ containerId = 'viewer', galleryId = 'thumbnailG
     // 如果是相机视锥体则切换到对应相机位置，否则切换到默认位置
     renderer.domElement.addEventListener('dblclick', function(event) {
        controls.autoRotate = false;
+
+       // 保存原始的内参（viewOffset）
+        const originalViewOffset = camera.view ? {
+            fullWidth: camera.view.fullWidth,
+            fullHeight: camera.view.fullHeight,
+            offsetX: camera.view.offsetX,
+            offsetY: camera.view.offsetY,
+            width: camera.view.width,
+            height: camera.view.height
+        } : null;
     
         // 始终执行重置相机行为
         const startPos = camera.position.clone();
@@ -538,15 +786,13 @@ export function initDemoViewer({ containerId = 'viewer', galleryId = 'thumbnailG
         const startFov = camera.fov;
         const endPos = new THREE.Vector3(0, 0, 0);
 
-        let targetCenter = initObjectPosition.clone();
-
         const tempCam = new THREE.PerspectiveCamera(75, camera.aspect, camera.near, camera.far);
         tempCam.position.copy(endPos);
         tempCam.up.set(0, 1, 0);
-        tempCam.lookAt(targetCenter);
-        controls.target.copy(targetCenter);
+        tempCam.lookAt(new THREE.Vector3(0, 0, -1));
+        controls.target.set(0, 0, initObjectPosition.z);
         const endQuat = tempCam.quaternion.clone();
-        const endFov = 75;
+        const endFov = camera.fov;
         
         animateClientCamera(startPos, startQuat, startFov, endPos, endQuat, endFov);
 
@@ -556,9 +802,23 @@ export function initDemoViewer({ containerId = 'viewer', galleryId = 'thumbnailG
             camera.fov = endFov;
             camera.up.set(0, 1, 0);
             camera.updateProjectionMatrix();
-            controls.target.copy(targetCenter);
+            controls.target.set(0, 0, initObjectPosition.z);
             controls.object.up.set(0, 1, 0);
             controls.update();
+
+            console.log('📊 Double-click Reset Camera State:', {
+                position: `(${camera.position.x.toFixed(3)}, ${camera.position.y.toFixed(3)}, ${camera.position.z.toFixed(3)})`,
+                target: `(${controls.target.x.toFixed(3)}, ${controls.target.y.toFixed(3)}, ${controls.target.z.toFixed(3)})`,
+                fov: camera.fov.toFixed(2) + '°',
+                aspect: camera.aspect.toFixed(3),
+                viewOffset: camera.view ? {
+                    offsetX: camera.view.offsetX.toFixed(2),
+                    offsetY: camera.view.offsetY.toFixed(2),
+                    fullWidth: camera.view.fullWidth,
+                    fullHeight: camera.view.fullHeight
+                } : 'none'
+            });
+
         }, 850);
     });
 
@@ -712,11 +972,11 @@ async function loadGLB(glbPath, transformMatrix = null, scale = 1.0, group = nul
                             if (hasNormals && normalCount > 0) {
                                 const normals = child.geometry.attributes.normal;
                             } else {
-                                console.warn(`  ⚠️ No normals found! Computing vertex normals...`);
+                                // console.warn(`  ⚠️ No normals found! Computing vertex normals...`);
                                 child.geometry.computeVertexNormals();
-                                console.log(`  ✅ Vertex normals computed:`, {
-                                    normalCount: child.geometry.attributes.normal.count
-                                });
+                                // console.log(`  ✅ Vertex normals computed:`, {
+                                //     normalCount: child.geometry.attributes.normal.count
+                                // });
                             }
                         }
 
@@ -886,7 +1146,7 @@ async function loadHOIDataFromMetadata(metadata, parentDir, loadToken = null) {
 
     console.log(`📦 Loading HOI object mesh from ${object_mesh_path}`);
     ensureLoadingOverlay();
-    setLoadingProgress(0, `Loading model`);
+    setLoadingProgress(0, `Loading object model...`);
         
     const loadedModel = await loadGLB(object_mesh_path, null, 1.0, null, null, loadToken);
     if (loadToken !== null && loadToken !== undefined && loadToken !== _currentLoadToken) return;
@@ -906,23 +1166,6 @@ async function loadHOIDataFromMetadata(metadata, parentDir, loadToken = null) {
         });
         videoFrames = [];
         
-        for (let i = 0; i < num_frames; ++i) {
-            const imgPath = `${videoFramesDir}/frame_${String(i).padStart(4, '0')}.png`;
-            try {
-                const tex = await loadTexture(imgPath);
-                // 检查是否被取消
-                if (loadToken !== null && loadToken !== undefined && loadToken !== _currentLoadToken) {
-                    tex.dispose();
-                    return;
-                }
-                videoFrames.push(tex);
-            } catch (err) {
-                console.warn(`Failed to load video frame ${i} from ${imgPath}:`, err);
-                videoFrames.push(null);
-            }
-        }
-        currentVideoFrameIndex = 0;
-
         // 清空之前的手部网格
         handMeshes.forEach(hand => {
             if (hand && hand.parent) {
@@ -946,6 +1189,39 @@ async function loadHOIDataFromMetadata(metadata, parentDir, loadToken = null) {
         handMeshes = [];
         currentHandMesh = null;
 
+        // 🔄 加载视频帧并显示进度
+        setLoadingProgress(10, `Loading video frames (0/${num_frames})...`);
+        let loadedFramesCount = 0;
+
+        // 并行加载所有视频帧纹理
+        const framePromises = Array.from({ length: num_frames }, (_, i) => 
+            loadTexture(`${videoFramesDir}/frame_${String(i).padStart(4, '0')}.png`)
+                .then(tex => {
+                    loadedFramesCount++;
+                    // 更新进度：10% - 30% 用于视频帧
+                    const progress = 10 + (loadedFramesCount / num_frames) * 20;
+                    setLoadingProgress(progress, `Loading video frames (${loadedFramesCount}/${num_frames})...`);
+                    return tex;
+                })
+                .catch(err => {
+                    console.warn(`Failed to load video frame ${i}:`, err);
+                    loadedFramesCount++;
+                    const progress = 10 + (loadedFramesCount / num_frames) * 20;
+                    setLoadingProgress(progress, `Loading video frames (${loadedFramesCount}/${num_frames})...`);
+                    return null;
+                })
+        );
+        
+        videoFrames = await Promise.all(framePromises);
+        
+        // 检查是否被取消
+        if (loadToken !== null && loadToken !== undefined && loadToken !== _currentLoadToken) {
+            videoFrames.forEach(tex => tex?.dispose());
+            return;
+        }
+        currentVideoFrameIndex = 0;
+
+        setLoadingProgress(30, `Loading object poses...`);
         const res = await fetch(object_poses_path);
         if (res.ok) {
             const poseData = await res.json();
@@ -983,9 +1259,14 @@ async function loadHOIDataFromMetadata(metadata, parentDir, loadToken = null) {
                 const position = new THREE.Vector3();
                 const quaternion = new THREE.Quaternion();
                 poseGL.decompose(position, quaternion, scale);
+
+                if (loadToken !== null && loadToken !== undefined && loadToken !== _currentLoadToken) {
+                    return;
+                }
                 
                 const firstPosition = position.clone();
                 initObjectPosition = firstPosition.clone();
+                console.log(`Initial object position from first frame pose: (${firstPosition.x.toFixed(3)}, ${firstPosition.y.toFixed(3)}, ${firstPosition.z.toFixed(3)})`);
                 
                 // ✅ 设置相机控制目标为第一帧位置
                 // controls.target.copy(firstPosition);
@@ -995,6 +1276,10 @@ async function loadHOIDataFromMetadata(metadata, parentDir, loadToken = null) {
             console.log(`🤖 Loaded HOI object poses for ${objectPoses.length} frames from ${object_poses_path}`);
         }
         
+        // 🔄 加载手部网格并显示进度
+        setLoadingProgress(35, `Loading hand meshes (0/${num_frames})...`);
+        let loadedHandsCount = 0;
+
         // 并行加载所有手部网格
         const loadPromises = [];
         for (let i = 0; i < num_frames; ++i) {
@@ -1035,11 +1320,19 @@ async function loadHOIDataFromMetadata(metadata, parentDir, loadToken = null) {
                     
                     // ✅ 添加到场景
                     scene.add(individualGroup);
+
+                    // 更新进度：35% - 90% 用于手部网格
+                    loadedHandsCount++;
+                    const progress = 35 + (loadedHandsCount / num_frames) * 55;
+                    setLoadingProgress(progress, `Loading hand meshes (${loadedHandsCount}/${num_frames})...`);
                     
                     return individualGroup;  // ← 返回 group 而不是 mesh
                 })
                 .catch(err => {
                     console.warn(`Failed to load hand ${i}:`, err);
+                    loadedHandsCount++;
+                    const progress = 35 + (loadedHandsCount / num_frames) * 55;
+                    setLoadingProgress(progress, `Loading hand meshes (${loadedHandsCount}/${num_frames})...`);
                     return null;
                 });
             
@@ -1076,7 +1369,8 @@ async function loadHOIDataFromMetadata(metadata, parentDir, loadToken = null) {
 
         handMeshes = loadedHands.filter(h => h !== null);
         console.log(`✅ Loaded ${handMeshes.length}/${num_frames} hand meshes`);
-
+        setLoadingProgress(90, `Loaded hand meshes (${handMeshes.length}/${num_frames})`);
+        // ✅ 加载相机内参并更新全局相机
         const intrinsicRes = await fetch(intrinsics_path);
         if (intrinsicRes.ok) {
             const intrinsicData = await intrinsicRes.json();
@@ -1141,8 +1435,10 @@ async function loadHOIDataFromMetadata(metadata, parentDir, loadToken = null) {
             // ✅ 添加相机视锥体（不传图片路径，会使用 videoFrames[0]）
             if (intrinsic) {
                 console.log('✅ Loaded camera intrinsics from', intrinsics_path);
+                setLoadingProgress(95, `Creating camera frustum...`);
                 await addCameraFrustum(null, null, null);
             }
+            setLoadingProgress(100, `Complete!`);
         }
         
         
@@ -1159,77 +1455,25 @@ function animate() {
     updateControlPanelInfo();
     
     // 更新物体姿态（应用坐标系转换和缩放）
-    if (objectPoses && currentModel && handMeshes.length > 0 && videoFrames.length > 0 && cameraFrustums.length > 0) {
+    if ( !isAnimationPaused && objectPoses && currentModel && handMeshes.length > 0 && videoFrames.length > 0 && cameraFrustums.length > 0) {
         const currentTime = performance.now();
         if (currentTime - lastPoseUpdateTime >= poseUpdateInterval) {
             lastPoseUpdateTime = currentTime;
             
-            // 获取当前帧的变换矩阵
-            const poseMatrix = objectPoses[currentFrameIndex];
-            
-            // 处理嵌套数组格式 [[x], [y], [z], []] → [x, y, z, w]
-            const flatPose = poseMatrix.map(row => {
-                if (Array.isArray(row)) {
-                    if (row.length === 1) return [row[0], 0, 0, 0];  // [[x]] → [x, 0, 0, 0]
-                    if (row.length === 0) return [0, 0, 0, 1];       // [] → [0, 0, 0, 1]
-                    return row;
-                }
-                return [row, 0, 0, 0];
-            });
-            
-            // 构建 4x4 姿态矩阵（OpenCV 坐标系）
-            const poseGL = new THREE.Matrix4().set(
-                flatPose[0][0], flatPose[0][1], flatPose[0][2], flatPose[0][3] * global_scale,
-                flatPose[1][0], flatPose[1][1], flatPose[1][2], flatPose[1][3] * global_scale,
-                flatPose[2][0], flatPose[2][1], flatPose[2][2], flatPose[2][3] * global_scale,
-                flatPose[3][0], flatPose[3][1], flatPose[3][2], flatPose[3][3]
-            );
-
-            // 分解矩阵为 position, rotation, scale
-            const position = new THREE.Vector3();
-            const quaternion = new THREE.Quaternion();
-            const scale = new THREE.Vector3();
-            poseGL.decompose(position, quaternion, scale);
-            
-            currentModel.scale.set(global_scale, global_scale, global_scale);
-            currentModel.position.copy(position);
-            currentModel.quaternion.copy(quaternion);
-            
-            if (handMeshesDir && handMeshes.length > 0) {
-                // 隐藏旧的手部网格
-                if (currentHandMesh) {
-                    currentHandMesh.visible = false;
-                }
-                currentHandMesh = handMeshes[currentFrameIndex];
-                currentHandMesh.visible = true;
-            } else {
-                console.warn('No hand meshes directory specified or no hand meshes loaded.');
-            }
-
-            // ✅ 更新相机视锥体上的图片纹理
-            if (videoFrames.length > 0 && cameraFrustums.length > 0) {
-                const currentTexture = videoFrames[currentFrameIndex];
-                if (currentTexture) {
-                    // 遍历所有相机视锥体
-                    cameraFrustums.forEach(frustum => {
-                        const cam = frustum.userData.camera;
-                        if (cam && cam.children && cam.children.length > 0) {
-                            // 找到图像平面
-                            const imagePlane = cam.children.find(child => 
-                                child.userData && child.userData.isImagePlane && child.isMesh
-                            );
-                            if (imagePlane && imagePlane.material) {
-                                // 更新纹理
-                                imagePlane.material.map = currentTexture;
-                                imagePlane.material.needsUpdate = true;
-                            }
-                        }
-                    });
-                }
-            }
+            updateFrame();
             
             // 循环播放
             currentFrameIndex = (currentFrameIndex + 1) % objectPoses.length;
+
+            // 更新滑块位置和帧数显示
+            const frameIndexSlider = document.getElementById('frameIndexSlider');
+            const frameIndexValue = document.getElementById('frameIndexValue');
+            if (frameIndexSlider && frameIndexValue && objectPoses) {
+                const progress = (currentFrameIndex / (objectPoses.length - 1)) * 100;
+                frameIndexSlider.value = progress;
+                // 显示 "当前帧/总帧数"（从1开始计数）
+                frameIndexValue.textContent = `${currentFrameIndex + 1}/${objectPoses.length}`;
+            }
         }
     }
     

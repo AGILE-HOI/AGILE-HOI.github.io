@@ -137,12 +137,21 @@
   cursor: pointer;
   font-size: 11px;
 }
+.control-panel #resetViewBtn { background: #53ca6f; }
 .control-panel #cameraViewBtn { background: #556bff; }
+.control-panel #toggleFrustumBtn { background: #2bb3ac; }
 .control-panel #toggleAxesBtn { background: #2dd4bf; }
 .control-panel #toggleAutoRotateBtn { background: #ffd166; color: black; }
 
 .control-panel .control-label { display:block; margin-bottom:4px; font-size:11px; }
 .control-panel .control-range { width:100%; height:6px; background:#333; }
+
+.action-frames, .actions-frames-jump {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: #41de92;
+}
 
 /* Make action labels visible by default (next to icons) */
 .action-text {
@@ -151,6 +160,23 @@
   font-size: 8px;
   color: #ffffffdd;
   font-weight: 600;
+}
+
+/* Frame slider disabled state */
+.control-range:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #222;
+}
+
+.control-range:disabled::-webkit-slider-thumb {
+  cursor: not-allowed;
+  background: #555;
+}
+
+.control-range:disabled::-moz-range-thumb {
+  cursor: not-allowed;
+  background: #555;
 }
 
 /* In case user toggles vertical layout, keep labels visible and adjust spacing */

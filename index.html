@@ -9,17 +9,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Open Graph -->
-    <meta property="og:url" content="https://agile.github.io/" />
-    <meta property="og:image" content="https://agile.github.io/static/img/AGILE.png" />
+    <meta property="og:url" content="https://agile-hoi.github.io/" />
+    <meta property="og:image" content="https://agile-hoi.github.io/static/img/AGILE.png" />
     <meta property="og:title" content="AGILE: Hand-object Interaction Reconstruction from Video via Agentic Generation" />
     <meta property="og:title" content="AGILE: Hand-object Interaction Reconstruction from Video via Agentic Generation" />
     <meta property="og:description"
         content="A framework that reconstructs simulation-ready interaction sequences from monocular video." />
 
     <!-- Twitter -->
-    <meta name="twitter:url" content="https://agile.github.io/" />
+    <meta name="twitter:url" content="https://agile-hoi.github.io/" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content="https://agile.github.io/static/img/AGILE.png" />
+    <meta name="twitter:image" content="https://agile-hoi.github.io/static/img/AGILE.png" />
     <meta name="twitter:title" content="AGILE: Hand-object Interaction Reconstruction from Video via Agentic Generation" />
     <meta name="twitter:description"
         content="A framework that reconstructs simulation-ready interaction sequences from monocular video." />
@@ -74,9 +74,12 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-    
+
       gtag('config', 'G-RY5G0G0QKD');
     </script>
+
+    <!-- Results Visualization Styles -->
+    <link rel="stylesheet" href="./static/css/results-visualization.css">
 </head>
 
 <body>
@@ -94,17 +97,16 @@
                 <div class="icon-container">
                     <div class="icon-item">
                         <img src="./static/img/icons/formula.svg" alt="Visual Representation Icon">
-                        <div><strong>Novel Generativion Pipeline</strong>: propose the first agentic HOI pipeline that integrates
+                        <div><strong>Novel Generation Pipeline</strong>: Propose the first agentic HOI pipeline that integrates
                             VLM-guided quality assessment with generative models,
                             enabling the production of high-fidelity, watertight meshes
-                            independent of video occlusions. 
+                            independent of video occlusions.
                         </div>
                     </div>
                     <div class="icon-item">
                         <img src="./static/img/icons/camera.svg" alt="Connector Design Icon">
-                        <div><strong>Robust Optimization Strategy</strong>: we introduce
-                            a robust anchor-and-track optimization strategy that elim-
-                            inates the dependency on brittle SfM by anchoring pose
+                        <div><strong>Robust Optimization Strategy</strong>: We introduce
+                            a robust anchor-and-track optimization strategy that eliminates the dependency on brittle SfM by anchoring pose
                             initialization at a single contact frame and propagating it
                             via semantic and geometric alignment.
                         </div>
@@ -113,8 +115,7 @@
                         <img src="./static/img/icons/cube.svg" alt="Instruction Tuning Data Icon">
                         <div><strong>Physics-Aware Constraints</strong>: We incorporate
                             physics-aware constraints to strictly enforce interaction stability
-                            and prevent penetration
-                            </p>
+                            and prevent penetration.
                         </div>
                     </div>
                 </div>
@@ -130,7 +131,7 @@
 
         <div class="teaser-caption">
             <div class="rounded" style="text-align: center; padding-bottom: 0px; padding-top: 5px;">
-                <div style="text-align: center; color:rgb(0, 0, 0); margin-top: 10px; margin-bottom: 10px;"><strong>TL;DR</strong>: Create <i>canonically posed</i> 3D objects and <i>object-centric cameras</i> from any images in a few forward steps.</div>
+                <div style="text-align: center; color:rgb(0, 0, 0); margin-top: 10px; margin-bottom: 10px;"><strong>TL;DR</strong>: Reconstruct <i>simulation-ready</i> hand-object interaction from monocular video via <i>agentic generation</i> and <i>robust pose tracking</i>.</div>
             </div>
         </div>
 
@@ -226,26 +227,17 @@
             <div id="sec:method" class="sub-section">
                 <h1 class="text">How AGILE Works?</h1>
 
-                <!-- <p class="text">
-                    Reconstructing a 3D object from a single 2D image is a classic challenge. A key difficulty is determining the camera's viewpoint. Our method, <strong>Cupid</strong>, introduces a novel solution: we don't just generate the 3D object, we <strong>jointly generate the object and its camera pose</strong> at the same time.
-                </p> -->
-                <!-- <h2 class="text">Method Overview</h2> -->
                 <p class="text">
-                    We use a powerful generative technique called Flow Model<d-cite
-                        key="lipman2022flow"></d-cite>. This model learns to transform random noise into a voxelized 3D representation, guided by the input image. To make this process efficient and effective, we break it down into two main stages<d-cite
-                        key="xiang2025structured"></d-cite>, as shown in <a href="#fig-method">Figure 1</a>.
+                    Given a monocular video of a hand-object interaction captured by a fixed camera, our goal is to reconstruct the 4D trajectory of both the hand and the object, yielding high-fidelity, simulation-ready 3D assets. Unlike previous methods that rely on neural rendering and fragile Structure-from-Motion (SfM) initialization, AGILE shifts the paradigm from <i>reconstruction</i> to <i>agentic generation</i>, combining VLM-guided supervision with robust pose tracking. Our framework consists of two main stages, as illustrated in <a href="#fig-pipeline">Figure 2</a>.
                 </p>
-                
+
+                <h2 class="text">Stage 1: Agentic Textured Object Generation</h2>
                 <p class="text">
-                    <strong>Stage 1: Occupancy and Pose Generation. </strong>  
-                    The first stage generates a coarse representation of the object and simultaneously estimates the camera pose. Given an input image, our flow model produces two key outputs: an occupancy cube (indicating which voxels $\mathbf{x}_i$ in space belong to the object) and a novel UV cube (indicating the 2D pixel locations $\mathbf{u}_i$ for each 3D voxel).
-                    we can robustly solve for the camera's projection matrix $\mathbf{P}^{*}$ using a classical least-squares solver<d-cite
-                        key="abdel2015direct"></d-cite>.
+                    A primary challenge in reconstructing hand-object interactions from monocular video is the severe occlusion of the object by the user's hand. To overcome these limitations, we propose an agentic framework where a VLM supervisor acts as an intelligent critic, bridging the gap between noisy generative priors and rigorous video evidence.
                 </p>
-                <p class="text" style="text-align: center;">
-                    $$
-                    \mathbf{P}^{*} = \argmin_{\mathbf{P}} \sum_{i} \big\Vert\pi(\mathbf{P},\mathbf{x}_i) - \mathbf{u}_i\big\Vert^2. \tag{1}
-                    $$
+
+                <p class="text">
+                    <strong>VLM-Guided Multi-View Synthesis.</strong> As illustrated in <a href="#fig-method">Figure 1</a>, our pipeline operates through a cascade of generative models steered by a VLM agent. Instead of relying on a single frame, the VLM first selects N informative keyframes (typically 1-4) from the input video to maximize viewpoint coverage. These frames prompt an image generation model to synthesize orthogonal views of the object. To ensure these hallucinations faithfully reflect the video content, we introduce a VLM-based critic. The VLM evaluates the consistency between generated views and original video frames, scoring them on geometry, texture, and material correspondence. Through a rejection sampling process, candidates falling below a strict consistency threshold are discarded and re-generated.
                 </p>
 
                                 <d-figure id="fig-method">
@@ -258,56 +250,97 @@
                 </d-figure>
 
                 <p class="text">
-                    <strong>Stage 2: Pose-Aligned Geometry and Appearance Generation. </strong>
-                    With the camera pose now known, the second stage generates the fine-grained geometry and appearance. A common problem here is "color drift" and "detail inconsistency", where the 3D model doesn't perfectly match the input image's colors and details. We solve this with a <strong>pose-aligned conditioner</strong> that inject pixel-wise information.
-                </p>
-                <p class="text">
-                    For each voxel in the occupancy cube, we use the calculated pose to find exactly where it lands on the 2D input image. We then sample features (both high-level semantics from DINO and low-level color/texture) from that precise pixel location. These pixel-aligned features are injected directly into the generation process, ensuring the final 3D model has high-fidelity geometry and appearance that is faithful to the input view.
+                    <strong>3D Lifting and Mesh Refinement.</strong> The validated multi-view images are processed by a feed-forward 3D generation model to produce an initial mesh. While geometrically plausible, raw outputs often suffer from irregular topology and blurry textures. To address this, we first apply automated retopology and UV unwrapping to create a clean, lightweight mesh optimized for physics simulation. Subsequently, we perform an <i>agentic texture refinement</i> step. The initial texture is enhanced using an image-to-image editing model conditioned on the evaluated high-resolution multi-view images to recover details. Crucially, this process is also supervised by the VLM agent. The VLM critic evaluates the refined texture against the multi-views via rejection sampling, ensuring strict visual fidelity and discarding any hallucinated artifacts. This rigorous quality control yields a simulation-ready asset with photo-realistic appearance and explicit topology.
                 </p>
 
-                <d-figure id="fig-method">
+                <h2 class="text">Stage 2: Hand-Object Interaction Optimization</h2>
+                <p class="text">
+                    To enable robust tracking without relying on brittle Structure-from-Motion, we establish metric initialization using foundation models. We employ MoGe-2 for depth estimation and SAM2 for segmentation. The hand is initialized via WiLoR to predict MANO parameters, with scale recovered through constrained ICP alignment. For the object, we identify the <i>interaction onset frame (IOF)</i>—when the object first exhibits motion—and apply FoundationPose to estimate its initial pose using our generated mesh.
+                </p>
+
+                <p class="text">
+                    Starting from the IOF, we perform bi-directional online optimization. For each frame, we first refine the hand translation via joint reprojection, then optimize the object pose using a composite loss that combines: (1) mask alignment for silhouette matching, (2) DINO semantic features for robust tracking under occlusion, and (3) <i>interaction stability constraints</i> that penalize penetration and lock the object to the grasping hand, ensuring physically plausible contact throughout the sequence.
+                </p>
+
+                <d-figure id="fig-pipeline">
                     <figure>
-                        <img data-zoomable="" draggable="false" src="static/img/pipeline.png" alt="Overview of the Cupid method.">
+                        <img data-zoomable="" draggable="false" src="static/img/pipeline.png" alt="Overview of the AGILE method.">
                         <figcaption>
-                            <strong>Figure 2: Overview of Cupid.</strong> Our two-stage process first generates a coarse shape and a novel "UV cube" to determine the camera pose. This pose then guides a second stage to generate high-fidelity geometry and appearance.
+                            <strong>Figure 2: Overview of AGILE.</strong> Our framework processes the input video in three phases: (1) <b>Agentic Generation:</b> A VLM-guided loop extracts keyframes and supervises the synthesis of a watertight, textured object mesh, utilizing rejection sampling to ensure visual fidelity. (2) <b>SfM-Free Initialization:</b> We decouple metric scale and pose. The hand is initialized via WiLoR, while the object pose is anchored at the Interaction Onset Frame (IOF) using a foundation model. (3) <b>Contact-Aware Optimization:</b> A bi-directional tracking process refines the trajectories. We stabilize the hand via geometric alignment and track the object using semantic and interaction constraints to ensure physical plausibility.
                         </figcaption>
                     </figure>
                 </d-figure>
-                
-                
 
-                <h2 class="text">Extension 1: Composing Components for Full Scene Reconstruction</h2>
+                <!-- <h2 class="text">Application: Real-to-Sim Retargeting</h2>
                 <p class="text">
-                    Our framework naturally extends to reconstructing entire scenes. We use an object detector (like SAM) to find all objects in an image. Then, we run our reconstruction process on each object independently.
-                    Then, using the 3D-2D correspondences our method provides, we align each reconstructed object with a global depth prior (from a model like MoGe<d-cite
-                        key="wang2025moge"></d-cite>). This allows us to solve for each object's correct scale and position, composing them into a single, coherent 3D scene.
-                </p>
-                
-                <d-figure id="fig-scene">
-                    <figure>
-                        <img data-zoomable="" draggable="false" src="static/img/scene.png" alt="Component-aligned scene reconstruction.">
-                        <figcaption>
-                            <strong>Figure 2: Component-Aligned Scene reconstruction.</strong> By reconstructing each object and then solving for its similarity transformation, we can accurately compose complex 3D scenes.
-                        </figcaption>
-                    </figure>
-                </d-figure>
-                
-                <h2 class="text">Extension 2: Multi-view Reconstruction</h2>
-                <p class="text">
-                    Although <strong>Cupid</strong> is trained with single image condition, it can be easily extended to multi-view reconstruction, thanks to the flexibility of our generative framework.
-                    Given multiple images of the same object from different angles, we know that the 3D object cube should be the same across all views.
-                    Therefore, we can run our flow model for each image, but share the same occupancy latent $\mathbf{X}$ across all views during the iterative flow sampling. This is similar to MultiDiffusion<d-cite
-                        key="bar2023multidiffusion"></d-cite> (which average the overlapped pixel regions in 2D during iterative sampling), but in the 3D space. 
+                    To validate the physical plausibility of our reconstructions for Embodied AI, we implement a scalable Real-to-Sim pipeline. We import the reconstructed sequence into Isaac Gym and map the human hand motion to a multi-fingered robotic hand (e.g., Shadow) using kinematic optimization, with the agentic-generated mesh serving as a dynamic rigid body.
                 </p>
 
-                <d-figure id="fig-multiview">
-                    <figure>
-                        <img data-zoomable="" draggable="false" src="static/img/multiview.png" alt="Multi-view conditioning results">
-                        <figcaption>
-                            <strong>Figure 3: Multi-view conditioning.</strong> When multiple input views are available, we fuse the shared, view-agnostic object latent across flow paths (similar to MultiDiffusion<d-cite key="bar2023multidiffusion"></d-cite>), enabling camera, geometry and texture refinement across all images. <em>Top</em>: inputs; <em>Middle</em>: reconstructed 3D object and camera poses; <em>Bottom</em>: rendered images and geometry.
-                        </figcaption>
-                    </figure>
-                </d-figure>
+                <p class="text">
+                    As illustrated below, AGILE effectively bridges the gap between video and simulation: (1) <b>Simulation-Ready Assets:</b> Our generated meshes are watertight and topologically clean, enabling stable collision detection without manual post-processing. (2) <b>Robust Kinematic Transfer:</b> Crucially, stable grasps are maintained solely through kinematic mapping, without auxiliary reinforcement learning or physics-based correction. This stability serves as a rigorous validation of our reconstruction quality, confirming that AGILE recovers accurate relative poses and contact states. By automating this process, our framework unlocks the potential to curate large-scale manipulation datasets from unconstrained monocular videos for generalist policy learning.
+                </p> -->
+
+                <!-- Results Section -->
+                <h1 class="text" style="margin-top: 60px;">Results</h1>
+
+                <!-- Visualization Mode Switch -->
+                <div class="viz-switch">
+                    <button class="viz-btn active" data-viz="reconstruction">Reconstruction Results</button>
+                    <button class="viz-btn" data-viz="rotation">3D Rotation</button>
+                    <button class="viz-btn" data-viz="retarget">Real-to-Sim Retargeting</button>
+                </div>
+
+                <!-- Reconstruction Results -->
+                <div class="viz-content active" id="viz-reconstruction">
+                    <p class="text" style="text-align: center; margin-bottom: 20px;">
+                        High-fidelity reconstruction results on diverse objects from HO3D, DexYCB, and in-the-wild sequences.
+                    </p>
+                    <video id="main-video-reconstruction" controls autoplay loop muted style="width:150%; margin-left:-20%; max-width: 3000px; border-radius:12px; box-shadow: 0 4px 24px rgba(0,0,0,0.12); object-fit: contain;">
+                        <source src="static/videos/ABF12.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="method-labels" id="method-labels-reconstruction">
+                        <!-- Labels will be dynamically generated by JavaScript -->
+                    </div>
+                    <div class="showcase-container">
+                        <div class="showcase-nav showcase-nav-left" data-showcase="reconstruction">‹</div>
+                        <div class="showcase-bar" id="showcase-reconstruction"></div>
+                        <div class="showcase-nav showcase-nav-right" data-showcase="reconstruction">›</div>
+                    </div>
+                </div>
+
+                <!-- Rotation Visualization -->
+                <div class="viz-content" id="viz-rotation">
+                    <p class="text" style="text-align: center; margin-bottom: 20px;">
+                        360° rotation visualization of reconstructed objects showing complete geometry and texture quality.
+                    </p>
+                    <video id="main-video-rotation" controls autoplay loop muted style="width:150%; margin-left:-20%; max-width: 3000px; border-radius:12px; box-shadow: 0 4px 24px rgba(0,0,0,0.12); object-fit: contain;">
+                        <source src="static/videos/ABF12_rotate.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="showcase-container">
+                        <div class="showcase-nav showcase-nav-left" data-showcase="rotation">‹</div>
+                        <div class="showcase-bar" id="showcase-rotation"></div>
+                        <div class="showcase-nav showcase-nav-right" data-showcase="rotation">›</div>
+                    </div>
+                </div>
+
+                <!-- Real-to-Sim Retargeting -->
+                <div class="viz-content" id="viz-retarget">
+                    <p class="text" style="text-align: center; margin-bottom: 20px;">
+                        Simulation-ready assets validated through real-to-sim retargeting in Isaac Gym.
+                    </p>
+                     <video id="main-video-retarget" controls autoplay loop muted style="width:150%; margin-left:-20%; max-width: 3000px; border-radius:12px; box-shadow: 0 4px 24px rgba(0,0,0,0.12); object-fit: contain;">
+                        <source src="static/videos/ABF12_retarget.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="showcase-container">
+                        <div class="showcase-nav showcase-nav-left" data-showcase="retarget">‹</div>
+                        <div class="showcase-bar" id="showcase-retarget"></div>
+                        <div class="showcase-nav showcase-nav-right" data-showcase="retarget">›</div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </d-article>
@@ -317,11 +350,11 @@
     <d-appendix>
         <h3>BibTeX</h3>
         <p class="bibtex">
-            @article{huang2025cupid,<br>
-                title={CUPID: Generative 3D Reconstruction via Joint Object and Pose Modeling},<br>
-                author={Huang, Binbin and Duan, Haobin and Zhao, Yiqun and Zhao, Zibo and Ma, Yi and Gao, Shenghua},<br>
-                journal={arXiv preprint arXiv:2510.20776},<br>
-                year={2025}<br>
+            @article{agile2026,<br>
+                title={AGILE: Hand-object Interaction Reconstruction from Video via Agentic Generation},<br>
+                    author={Anonymous},<br>
+                    journal={Under Review},<br>
+                    year={2026}<br>
                 }
         </p>
 
@@ -330,11 +363,21 @@
 
         <h3>Acknowledgement</h3>
         <p>
-            We thank <a href="https://www.sainingxie.com/" target="_blank">NYU VisionX</a> and <a href="https://agile.github.io/" target="_blank">Cupid</a> for the nice project page template.
+            We thank the authors of related works for their nice project page templates and open-source implementations.
         </p>
     </d-appendix>
+
+    <!-- Hidden citations for bibliography (used in dynamically generated content) -->
+    <div style="display: none;">
+        <d-cite key="fan2024hold"></d-cite>
+        <d-cite key="wang2025magichoi"></d-cite>
+    </div>
+
     <!-- bibliography will be inlined during Distill pipeline's pre-rendering -->
     <d-bibliography src="bibliography.bib"></d-bibliography>
     <!-- <script src="./static/js/nav-bar.js"></script> -->
+
+    <!-- Results Visualization Script -->
+    <script defer src="./static/js/results-visualization.js"></script>
 </body>
 </html>
