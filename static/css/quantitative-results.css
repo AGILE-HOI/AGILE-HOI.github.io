@@ -1,0 +1,421 @@
+/* Quantitative Results Section Styles */
+
+/* Container */
+.quantitative-block {
+    max-width: 1100px;
+    margin: 60px auto 40px auto;
+    padding: 0 48px;
+}
+
+/* Dataset Toggle Buttons */
+.dataset-switch {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 25px 0 20px 0;
+    padding: 6px;
+    background: rgba(247, 249, 252, 0.5);
+    border-radius: 40px;
+    box-shadow: 0 2px 8px rgba(52, 85, 120, 0.04);
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.dataset-btn {
+    border: 1.5px solid rgba(212, 196, 168, 0.4);
+    background: #FDF8F0;
+    color: #5a5a5a;
+    padding: 8px 24px;
+    border-radius: 18px;
+    font-size: 0.92rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.dataset-btn:hover:not(.active) {
+    background: #F5ECDC;
+    color: #3a3a3a;
+    border-color: rgba(212, 196, 168, 0.6);
+}
+
+.dataset-btn.active {
+    background: #E8D5B7;
+    color: #3a3a3a;
+    border-color: rgba(212, 196, 168, 0.8);
+    box-shadow: 0 2px 6px rgba(212, 196, 168, 0.3);
+}
+
+/* View Toggle (Table vs Chart) */
+.quant-viz-switch {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 20px 0;
+    padding: 6px;
+    background: rgba(247, 249, 252, 0.5);
+    border-radius: 40px;
+    box-shadow: 0 2px 8px rgba(52, 85, 120, 0.04);
+    max-width: 350px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.quant-viz-btn {
+    border: 1.5px solid rgba(212, 196, 168, 0.4);
+    background: #FDF8F0;
+    color: #5a5a5a;
+    padding: 8px 24px;
+    border-radius: 18px;
+    font-size: 0.92rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.quant-viz-btn:hover:not(.active) {
+    background: #F5ECDC;
+    color: #3a3a3a;
+    border-color: rgba(212, 196, 168, 0.6);
+}
+
+.quant-viz-btn.active {
+    background: #E8D5B7;
+    color: #3a3a3a;
+    border-color: rgba(212, 196, 168, 0.8);
+    box-shadow: 0 2px 6px rgba(212, 196, 168, 0.3);
+}
+
+/* Chart Mode Toggle (Individual vs Comprehensive) */
+.chart-mode-switch {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 0 0 30px 0;
+    padding: 6px;
+    background: rgba(247, 249, 252, 0.5);
+    border-radius: 40px;
+    box-shadow: 0 2px 8px rgba(52, 85, 120, 0.04);
+    max-width: 350px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.chart-mode-btn {
+    border: 1.5px solid rgba(212, 196, 168, 0.4);
+    background: #FDF8F0;
+    color: #5a5a5a;
+    padding: 8px 20px;
+    border-radius: 18px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.chart-mode-btn:hover:not(.active) {
+    background: #F5ECDC;
+    color: #3a3a3a;
+    border-color: rgba(212, 196, 168, 0.6);
+}
+
+.chart-mode-btn.active {
+    background: #E8D5B7;
+    color: #3a3a3a;
+    border-color: rgba(212, 196, 168, 0.8);
+    box-shadow: 0 2px 6px rgba(212, 196, 168, 0.3);
+}
+
+/* View Container */
+.quant-view {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.quant-view.active {
+    display: block;
+    opacity: 1;
+}
+
+/* Table Styles */
+.table-container {
+    margin: 30px 0;
+    overflow-x: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    width: 120%;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    font-size: 0.95rem;
+}
+
+.comparison-table th {
+    background: linear-gradient(180deg, #F5E8D8 0%, #EBD9C3 100%);
+    color: #3a3a3a;
+    padding: 14px 12px;
+    text-align: center;
+    font-weight: 600;
+    border-bottom: 2px solid #D4C4A8;
+    font-size: 0.90rem;
+}
+
+.comparison-table th.metric-header {
+    font-size: 0.85rem;
+}
+
+.comparison-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.comparison-table tr:hover {
+    background: rgba(232, 213, 183, 0.1);
+}
+
+.comparison-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Method name column */
+.comparison-table td:first-child {
+    font-weight: 500;
+    text-align: left;
+    padding-left: 20px;
+}
+
+/* Highlight "Ours" row */
+.comparison-table tr.ours-row {
+    background: rgba(156, 175, 136, 0.08);
+}
+
+.comparison-table tr.ours-row:hover {
+    background: rgba(156, 175, 136, 0.15);
+}
+
+.comparison-table tr.ours-row td:first-child {
+    color: #5a7a3f;
+    font-weight: 600;
+}
+
+/* Best value styling */
+.best-value {
+    font-weight: 700;
+    color: #2d5016;
+}
+
+/* Second best value styling */
+.second-best {
+    text-decoration: underline;
+    text-decoration-color: #7b9c58;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 2px;
+}
+
+/* Metric direction indicators */
+.metric-arrow {
+    font-size: 0.75rem;
+    color: #888;
+    margin-left: 3px;
+}
+
+/* Note text */
+.note {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 20px;
+    line-height: 1.6;
+}
+
+/* Chart Container */
+#comparison-chart {
+    margin: 30px 0;
+    min-height: 400px;
+}
+
+/* Individual charts grid */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin: 20px 0;
+}
+
+.chart-item {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.chart-title {
+    text-align: center;
+    font-weight: 600;
+    color: #3a3a3a;
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+/* Comprehensive chart container */
+.comprehensive-chart {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    min-height: 500px;
+}
+
+/* D3.js Tooltip */
+.d3-tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    pointer-events: none;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.d3-tooltip.show {
+    opacity: 1;
+}
+
+.d3-tooltip .method-name {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.d3-tooltip .metric-value {
+    font-size: 0.95rem;
+}
+
+/* Legend */
+.chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 20px 0 10px 0;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.92rem;
+}
+
+.legend-color {
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+}
+
+/* Axis labels */
+.axis-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    fill: #3a3a3a;
+}
+
+.tick text {
+    font-size: 0.85rem;
+    fill: #5a5a5a;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .quantitative-block {
+        padding: 0 20px;
+        margin: 40px auto 30px auto;
+    }
+
+    .dataset-switch,
+    .quant-viz-switch,
+    .chart-mode-switch {
+        max-width: 100%;
+        gap: 8px;
+    }
+
+    .dataset-btn,
+    .quant-viz-btn,
+    .chart-mode-btn {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+    }
+
+    .table-container {
+        margin: 20px -20px;
+        border-radius: 0;
+        width: 100%;
+        left: 0;
+        transform: none;
+    }
+
+    .comparison-table {
+        font-size: 0.82rem;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+        padding: 10px 8px;
+    }
+
+    .comparison-table td:first-child {
+        padding-left: 12px;
+    }
+
+    .charts-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .chart-item {
+        padding: 15px;
+    }
+
+    .comprehensive-chart {
+        padding: 20px 15px;
+        min-height: 400px;
+    }
+
+    .chart-legend {
+        gap: 15px;
+        font-size: 0.85rem;
+    }
+
+    .legend-color {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+/* Print styles */
+@media print {
+    .dataset-switch,
+    .quant-viz-switch,
+    .chart-mode-switch {
+        display: none;
+    }
+
+    .quant-view {
+        display: block !important;
+        opacity: 1 !important;
+    }
+}

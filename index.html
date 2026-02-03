@@ -80,6 +80,7 @@
 
     <!-- Results Visualization Styles -->
     <link rel="stylesheet" href="./static/css/results-visualization.css">
+    <link rel="stylesheet" href="./static/css/quantitative-results.css">
 </head>
 
 <body>
@@ -97,7 +98,7 @@
                 <div class="icon-container">
                     <div class="icon-item">
                         <img src="./static/img/icons/formula.svg" alt="Visual Representation Icon">
-                        <div><strong>Novel Generation Pipeline</strong>: Propose the first agentic HOI pipeline that integrates
+                        <div><strong>Novel Generation Pipeline</strong>: We propose the first agentic HOI pipeline that integrates
                             VLM-guided quality assessment with generative models,
                             enabling the production of high-fidelity, watertight meshes
                             independent of video occlusions.
@@ -228,45 +229,45 @@
                 <h1 class="text">How AGILE Works?</h1>
 
                 <p class="text">
-                    Given a monocular video of a hand-object interaction captured by a fixed camera, our goal is to reconstruct the 4D trajectory of both the hand and the object, yielding high-fidelity, simulation-ready 3D assets. Unlike previous methods that rely on neural rendering and fragile Structure-from-Motion (SfM) initialization, AGILE shifts the paradigm from <i>reconstruction</i> to <i>agentic generation</i>, combining VLM-guided supervision with robust pose tracking. Our framework consists of two main stages, as illustrated in <a href="#fig-pipeline">Figure 2</a>.
+                    Given monocular video, AGILE reconstructs 4D hand-object trajectories with simulation-ready assets. Unlike methods relying on neural rendering and fragile SfM, we shift from <i>reconstruction</i> to <i>agentic generation</i> with VLM-guided supervision and robust pose tracking (<a href="#fig-pipeline">Figure 2</a>).
                 </p>
 
                 <h2 class="text">Stage 1: Agentic Textured Object Generation</h2>
                 <p class="text">
-                    A primary challenge in reconstructing hand-object interactions from monocular video is the severe occlusion of the object by the user's hand. To overcome these limitations, we propose an agentic framework where a VLM supervisor acts as an intelligent critic, bridging the gap between noisy generative priors and rigorous video evidence.
+                    To address severe hand occlusion, we employ an agentic framework where a VLM guides multi-view synthesis and supervises mesh generation via rejection sampling.
                 </p>
 
-                <p class="text">
-                    <strong>VLM-Guided Multi-View Synthesis.</strong> As illustrated in <a href="#fig-method">Figure 1</a>, our pipeline operates through a cascade of generative models steered by a VLM agent. Instead of relying on a single frame, the VLM first selects N informative keyframes (typically 1-4) from the input video to maximize viewpoint coverage. These frames prompt an image generation model to synthesize orthogonal views of the object. To ensure these hallucinations faithfully reflect the video content, we introduce a VLM-based critic. The VLM evaluates the consistency between generated views and original video frames, scoring them on geometry, texture, and material correspondence. Through a rejection sampling process, candidates falling below a strict consistency threshold are discarded and re-generated.
-                </p>
-
-                                <d-figure id="fig-method">
+                <d-figure id="fig-method">
                     <figure>
                         <img data-zoomable="" draggable="false" src="static/img/agentic_gen.png" alt="Pipeline for Agentic Textured Object Generation.">
                         <figcaption>
-                            <strong>Figure 1: Overview of Agentic Textured Object Generation.</strong> A VLM agent first selects informative keyframes from the input video to guide multi-view synthesis. To ensure consistency, a VLM-based critic filters the generated views via rejection sampling. The validated images are then lifted to 3D, followed by automated topology optimization and texture refinement. As highlighted in the bottom-right comparison, this refinement step significantly enhances texture fidelity against the evaluated multi-views, yielding a high-quality, simulation-ready asset.
+                            <strong>Figure 1: Agentic Textured Object Generation.</strong> A VLM agent selects keyframes and guides multi-view synthesis with rejection sampling. Validated views are lifted to 3D, followed by topology optimization and VLM-supervised texture refinement.
                         </figcaption>
                     </figure>
                 </d-figure>
 
                 <p class="text">
-                    <strong>3D Lifting and Mesh Refinement.</strong> The validated multi-view images are processed by a feed-forward 3D generation model to produce an initial mesh. While geometrically plausible, raw outputs often suffer from irregular topology and blurry textures. To address this, we first apply automated retopology and UV unwrapping to create a clean, lightweight mesh optimized for physics simulation. Subsequently, we perform an <i>agentic texture refinement</i> step. The initial texture is enhanced using an image-to-image editing model conditioned on the evaluated high-resolution multi-view images to recover details. Crucially, this process is also supervised by the VLM agent. The VLM critic evaluates the refined texture against the multi-views via rejection sampling, ensuring strict visual fidelity and discarding any hallucinated artifacts. This rigorous quality control yields a simulation-ready asset with photo-realistic appearance and explicit topology.
+                    <strong>VLM-Guided Multi-View Synthesis.</strong> A VLM agent selects informative keyframes to synthesize orthogonal object views. A VLM critic filters generated images via rejection sampling to ensure consistency with video observations.
+                </p>
+
+                <p class="text">
+                    <strong>3D Lifting and Mesh Refinement.</strong> Validated views are processed to generate an initial mesh, then refined through automated retopology and VLM-supervised texture enhancement, producing simulation-ready assets with high-fidelity appearance.
                 </p>
 
                 <h2 class="text">Stage 2: Hand-Object Interaction Optimization</h2>
                 <p class="text">
-                    To enable robust tracking without relying on brittle Structure-from-Motion, we establish metric initialization using foundation models. We employ MoGe-2 for depth estimation and SAM2 for segmentation. The hand is initialized via WiLoR to predict MANO parameters, with scale recovered through constrained ICP alignment. For the object, we identify the <i>interaction onset frame (IOF)</i>—when the object first exhibits motion—and apply FoundationPose to estimate its initial pose using our generated mesh.
+                    We establish metric initialization using foundation models (MoGe-2 for depth, SAM2 for segmentation). The hand is initialized via WiLoR with scale recovered through ICP. For the object, we identify the <i>interaction onset frame</i> and apply FoundationPose using our generated mesh.
                 </p>
 
                 <p class="text">
-                    Starting from the IOF, we perform bi-directional online optimization. For each frame, we first refine the hand translation via joint reprojection, then optimize the object pose using a composite loss that combines: (1) mask alignment for silhouette matching, (2) DINO semantic features for robust tracking under occlusion, and (3) <i>interaction stability constraints</i> that penalize penetration and lock the object to the grasping hand, ensuring physically plausible contact throughout the sequence.
+                    Starting from this frame, we perform bi-directional optimization. For each frame, we refine hand translation via joint reprojection, then optimize object pose using mask alignment, DINO semantic features, and <i>interaction stability constraints</i> that prevent penetration and lock the object to the grasping hand.
                 </p>
 
                 <d-figure id="fig-pipeline">
                     <figure>
                         <img data-zoomable="" draggable="false" src="static/img/pipeline.png" alt="Overview of the AGILE method.">
                         <figcaption>
-                            <strong>Figure 2: Overview of AGILE.</strong> Our framework processes the input video in three phases: (1) <b>Agentic Generation:</b> A VLM-guided loop extracts keyframes and supervises the synthesis of a watertight, textured object mesh, utilizing rejection sampling to ensure visual fidelity. (2) <b>SfM-Free Initialization:</b> We decouple metric scale and pose. The hand is initialized via WiLoR, while the object pose is anchored at the Interaction Onset Frame (IOF) using a foundation model. (3) <b>Contact-Aware Optimization:</b> A bi-directional tracking process refines the trajectories. We stabilize the hand via geometric alignment and track the object using semantic and interaction constraints to ensure physical plausibility.
+                            <strong>Figure 2: Overview of AGILE.</strong> (1) <b>Agentic Generation:</b> VLM-guided multi-view synthesis with rejection sampling produces a watertight textured mesh. (2) <b>SfM-Free Initialization:</b> Hand initialized via WiLoR, object pose anchored at Interaction Onset Frame. (3) <b>Contact-Aware Optimization:</b> Bi-directional tracking with semantic and interaction constraints.
                         </figcaption>
                     </figure>
                 </d-figure>
@@ -281,7 +282,7 @@
                 </p> -->
 
                 <!-- Results Section -->
-                <h1 class="text" style="margin-top: 60px;">Results</h1>
+                <h1 class="text" style="margin-top: 60px;">Qualitative Results</h1>
 
                 <!-- Visualization Mode Switch -->
                 <div class="viz-switch">
@@ -293,7 +294,7 @@
                 <!-- Reconstruction Results -->
                 <div class="viz-content active" id="viz-reconstruction">
                     <p class="text" style="text-align: center; margin-bottom: 20px;">
-                        High-fidelity reconstruction results on diverse objects from HO3D, DexYCB, and in-the-wild sequences.
+                        High-fidelity reconstruction results on diverse objects from HO3D-v3<d-cite key="hampali2020honnotate"></d-cite>, DexYCB<d-cite key="chao2021dexycb"></d-cite>, and in-the-wild sequences.
                     </p>
                     <video id="main-video-reconstruction" controls autoplay loop muted style="width:150%; margin-left:-20%; max-width: 3000px; border-radius:12px; box-shadow: 0 4px 24px rgba(0,0,0,0.12); object-fit: contain;">
                         <source src="static/videos/ABF12.mp4" type="video/mp4">
@@ -343,6 +344,53 @@
 
             </div>
         </div>
+
+        <!-- Quantitative Comparison Section -->
+        <div id='quantitative' class="vision-block">
+            <div class="sub-section">
+                <h1 class="text" style="margin-top: 60px;">Quantitative Results</h1>
+                <p class="text">
+                    We conduct extensive quantitative evaluation on HO3D-v3<d-cite key="hampali2020honnotate"></d-cite> and DexYCB<d-cite key="chao2021dexycb"></d-cite> datasets,
+                    comparing AGILE against state-of-the-art methods HOLD<d-cite key="fan2024hold"></d-cite>
+                    and MagicHOI<d-cite key="wang2025magichoi"></d-cite> across
+                    multiple metrics including hand pose accuracy (MPJPE), object geometry fidelity (CD, F-scores),
+                    interaction quality (CD<sub>h</sub>), and success rate (SR).
+                </p>
+
+                <!-- Dataset Toggle -->
+                <div class="dataset-switch">
+                    <button class="dataset-btn" data-dataset="ho3d">HO3D-v3</button>
+                    <button class="dataset-btn active" data-dataset="dexycb">DexYCB</button>
+                </div>
+
+                <!-- View Toggle - Hidden -->
+                <div class="quant-viz-switch" style="display: none;">
+                    <button class="quant-viz-btn active" data-view="table">Table View</button>
+                    <button class="quant-viz-btn" data-view="chart">Chart View</button>
+                </div>
+
+                <!-- Table View -->
+                <div id="table-view" class="quant-view active">
+                    <div class="table-container" id="comparison-table"></div>
+                </div>
+
+                <!-- Chart View - Hidden -->
+                <div id="chart-view" class="quant-view" style="display: none;">
+                    <!-- Chart Mode Toggle -->
+                    <div class="chart-mode-switch">
+                        <button class="chart-mode-btn active" data-mode="individual">By Metric</button>
+                        <button class="chart-mode-btn" data-mode="comprehensive">Overall</button>
+                    </div>
+                    <div id="comparison-chart"></div>
+                </div>
+
+                <p class="text note" style="font-size: 0.9em; color: #666; margin-top: 20px;">
+                    <strong>Note:</strong> Baseline metrics (<sup>†</sup>) are averaged over successful sequences only (survivor bias).
+                    AGILE achieves 100% success rate on both datasets, while HOLD fails on 55% of DexYCB
+                    sequences and MagicHOI fails on 75%.
+                </p>
+            </div>
+        </div>
     </d-article>
 
 
@@ -363,7 +411,7 @@
 
         <h3>Acknowledgement</h3>
         <p>
-            We thank the authors of related works for their nice project page templates and open-source implementations.
+            We thank <a href="https://www.sainingxie.com/" target="_blank">NYU VisionX</a> and <a href="https://cupid3d.github.io/" target="_blank">Cupid</a> for the nice project page template.
         </p>
     </d-appendix>
 
@@ -379,5 +427,8 @@
 
     <!-- Results Visualization Script -->
     <script defer src="./static/js/results-visualization.js"></script>
+
+    <!-- Quantitative Results Script -->
+    <script defer src="./static/js/quantitative-results.js"></script>
 </body>
 </html>
