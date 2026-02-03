@@ -98,12 +98,18 @@ const methodColors = {
 };
 
 // Current state
-let currentDataset = 'dexycb';
+let currentDataset = 'ho3d';
 let currentView = 'table';
 let currentChartMode = 'individual';
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
+    // Read initial dataset from active button
+    const activeBtn = document.querySelector('.dataset-btn.active');
+    if (activeBtn && activeBtn.dataset.dataset) {
+        currentDataset = activeBtn.dataset.dataset;
+    }
+
     // Render initial table
     renderTable(currentDataset);
 

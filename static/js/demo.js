@@ -12,7 +12,7 @@ let currentImage = null;
 let cameraFrustums = [];
 let currentHoveredFrustum = null;
 let currentHoveredMesh = null;
-let imageOpacity = 0.5; // Global image opacity state
+let imageOpacity = 0.3; // Global image opacity state
 // Token to identify the latest requested load; incrementing cancels prior loads logically
 let _currentLoadToken = 0;
 
@@ -64,12 +64,12 @@ function createControlPanel(containerId) {
             <h4>🎞️ Video Frames</h4>
             <div class="actions-row actions-row-two" style="display:flex; flex-direction:column; gap:6px;">
                 <div class="actions-row-top" style="display:flex; gap:8px; align-items:center;">    
-                    <button id="previousFrameBtn" class="action-button" title="Previous frame" aria-label="Previous frame">◁ <span class="action-text">Prev</span></button>
-                    <button id="nextFrameBtn" class="action-button" title="Next frame" aria-label="Next frame">▷ <span class="action-text">Next</span></button>
+                    <button id="previousFrameBtn" class="action-button-video" title="Previous frame" aria-label="Previous frame">◁ <span class="action-text">Prev</span></button>
+                    <button id="nextFrameBtn" class="action-button-video" title="Next frame" aria-label="Next frame">▷ <span class="action-text">Next</span></button>
                 </div>
                 <div class="actions-row-bottom" style="display:flex; gap:8px; align-items:center;">
-                    <button id="firstFrameBtn" class="action-button" title="First frame" aria-label="First frame">⏮️<span class="action-text">First</span></button>
-                    <button id="lastFrameBtn" class="action-button" title="Last frame" aria-label="Last frame">⏭️<span class="action-text">Last</span></button>
+                    <button id="firstFrameBtn" class="action-button-video" title="First frame" aria-label="First frame">⏮️<span class="action-text">First</span></button>
+                    <button id="lastFrameBtn" class="action-button-video" title="Last frame" aria-label="Last frame">⏭️<span class="action-text">Last</span></button>
                 </div>
             </div>
             <div class="control-label">Frame Index: <span id="frameIndexValue">0</span></div>
@@ -79,11 +79,11 @@ function createControlPanel(containerId) {
         <div class="control-section">
             <h4>📷 Camera Control</h4>
             <div class="actions-row actions-row-two" style="display:flex; flex-direction:column; gap:6px;">
-                <div class="actions-frames" style="display:flex; gap:8px; align-items:center;">
+                <div class="actions-row-top" style="display:flex; gap:8px; align-items:center;">
                     <button id="resetViewBtn" class="action-button" aria-label="Reset view">🏠 <span class="action-text">Reset</span></button>
                     <button id="toggleFrustumBtn" class="action-button" title="Toggle camera frustum" aria-label="Toggle camera frustum">📷 <span class="action-text">Frustum</span></button>
                 </div>
-                <div class="actions-frames-jump" style="display:flex; gap:8px; align-items:center;">
+                <div class="actions-row-bottom" style="display:flex; gap:8px; align-items:center;">
                     <button id="toggleAutoRotateBtn" class="action-button" title="Toggle auto-rotate" aria-label="Toggle auto-rotate">🔁 <span class="action-text">Spin</span></button>
                     <button id="toggleFullscreenBtn" class="action-button" title="Toggle fullscreen" aria-label="Toggle fullscreen">⤢ <span class="action-text">Full</span></button>
                 </div>
@@ -91,9 +91,9 @@ function createControlPanel(containerId) {
         </div>
 
         <div class="control-section">
-            <h4>🎨 Image</h4>
-            <div class="control-label">Opacity: <span id="opacityValue">50%</span></div>
-            <input type="range" id="imageOpacitySlider" min="0" max="100" value="50" class="control-range">
+            <h4>🎨 Video Overlay</h4>
+            <div class="control-label">Opacity: <span id="opacityValue">30%</span></div>
+            <input type="range" id="imageOpacitySlider" min="0" max="100" value="30" class="control-range">
         </div>
         
     `;
@@ -1303,6 +1303,10 @@ async function loadHOIDataFromMetadata(metadata, parentDir, loadToken = null) {
                             const materials = Array.isArray(child.material) ? child.material : [child.material];
                             materials.forEach(mat => {
                                 mat.side = THREE.DoubleSide;
+                                // Set hand mesh color to purple-blue
+                                if (mat.color) {
+                                    mat.color.setHex(0x9690F8); // Purple-blue color
+                                }
                                 mat.needsUpdate = true;
                             });
                         }

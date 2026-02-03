@@ -146,11 +146,13 @@
 .control-panel .control-label { display:block; margin-bottom:4px; font-size:11px; }
 .control-panel .control-range { width:100%; height:6px; background:#333; }
 
-.action-frames, .actions-frames-jump {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  background: #41de92;
+.action-button-video {
+  background: #2bb3ac;
+  border: none;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
 }
 
 /* Make action labels visible by default (next to icons) */

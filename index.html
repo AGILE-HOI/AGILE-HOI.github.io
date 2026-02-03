@@ -142,15 +142,6 @@
         Reconstructing dynamic hand-object interactions from monocular videos is critical for dexterous manipulation data collection and creating realistic digital twins for robotics and VR. However, current methods face two prohibitive barriers: (1) reliance on neural rendering often yields fragmented, non-simulation-ready geometries under heavy occlusion, and (2) dependence on brittle Structure-from-Motion (SfM) initialization leads to frequent failures on in-the-wild footage. To overcome these limitations, we introduce AGILE, a robust framework that shifts the paradigm from reconstruction to agentic generation for interaction learning. First, we employ an agentic pipeline where a Vision-Language Model (VLM) guides a generative model to synthesize a complete, watertight object mesh with high-fidelity texture, independent of video occlusions. Second, bypassing fragile SfM entirely, we propose a robust anchor-and-track strategy. We initialize the object pose at a single interaction onset frame using a foundation model and propagate it temporally by leveraging the strong visual similarity between our generated asset and video observations. Finally, a contact-aware optimization integrates semantic, geometric, and interaction stability constraints to enforce physical plausibility. Extensive experiments on HO3D, DexYCB, and in-the-wild videos reveal that AGILE outperforms baselines in global geometric accuracy while demonstrating exceptional robustness on challenging sequences where prior arts frequently collapse. By prioritizing physical validity, our method produces simulation-ready assets validated via real-to-sim retargeting for robotic applications.
         </p> 
 
-        <!-- Demo video
-        <h1 class="text">Demo Video</h1>
-        <div class="teaser-container">
-            <video id="agile-demo" poster="static/AGILE_teaser_frame.png" class="teaser-video rounded" autoplay loop muted controls playsinline preload="metadata">
-                <source src="static/AGILE_video.mp4" type="video/mp4">
-                Your browser does not support the video tag. <a href="static/AGILE_video.mp4">Download the teaser</a>.
-            </video>
-        </div> -->
-
         <!-- <hr> -->
         <div id='interactive_demo' class="interactive-demo-block">
             <div id="sec:interactive_demo" class="sub-section">
@@ -174,9 +165,9 @@
                                         <span style="font-size:0.92em; color:#485f7a;">How to inspect camera views</span>
                                     </div>
                                     <p class="viewer-tip" style="margin:0; color:#23303f; font-size:0.96em; line-height:1.4;">
-                                        Double-click to reset the view. Then open the control panel (top-left) and use the <strong>Image Opacity</strong> slider to compare the camera image with the 3D model.
+                                        Double-click to reset the view. Use the <strong>play/pause button</strong> (⏸️) to pause the animation and <strong>frame controls</strong> to navigate. Adjust <strong>Opacity</strong> to compare video frames with the 3D hand-object reconstruction.
                                         <br>
-                                        <small style="color:#657789;">Scene / multi-view examples are available at the end of the thumbnail list.</small>
+                                        <small style="color:#657789;">The purple-blue mesh shows the reconstructed hand, and the object mesh updates dynamically with the video.</small>
                                     </p>
                                 </div>
                             </div>
@@ -211,7 +202,8 @@
                     { metadataPath: 'static/results/SM2/metadata.json', thumbnail: 'static/results/SM2/thumbnail.png' },
                     { metadataPath: 'static/results/GSF13/metadata.json', thumbnail: 'static/results/GSF13/thumbnail.png' },
                     { metadataPath: 'static/results/ABF12/metadata.json', thumbnail: 'static/results/ABF12/thumbnail.png' },
-                    
+                    { metadataPath: 'static/results/SMu40/metadata.json', thumbnail: 'static/results/SMu40/thumbnail.png' },
+                    { metadataPath: 'static/results/MDF12/metadata.json', thumbnail: 'static/results/MDF12/thumbnail.png' },
                 ];
                 
                 // Initialize the modular Three.js viewer
@@ -359,8 +351,8 @@
 
                 <!-- Dataset Toggle -->
                 <div class="dataset-switch">
-                    <button class="dataset-btn" data-dataset="ho3d">HO3D-v3</button>
-                    <button class="dataset-btn active" data-dataset="dexycb">DexYCB</button>
+                    <button class="dataset-btn active" data-dataset="ho3d">HO3D-v3</button>
+                    <button class="dataset-btn" data-dataset="dexycb">DexYCB</button>
                 </div>
 
                 <!-- View Toggle - Hidden -->
