@@ -237,6 +237,14 @@
                     To address severe hand occlusion, we employ an agentic framework where a VLM guides multi-view synthesis and supervises mesh generation via rejection sampling.
                 </p>
 
+                <p class="text">
+                    <strong>VLM-Guided Multi-View Synthesis.</strong> A VLM agent selects informative keyframes to synthesize orthogonal object views. A VLM critic filters generated images via rejection sampling to ensure consistency with video observations.
+                </p>
+
+                <p class="text">
+                    <strong>3D Lifting and Mesh Refinement.</strong> Validated views are processed to generate an initial mesh, then refined through automated retopology and VLM-supervised texture enhancement, producing simulation-ready assets with high-fidelity appearance.
+                </p>
+
                 <d-figure id="fig-method">
                     <figure>
                         <img data-zoomable="" draggable="false" src="static/img/agentic_gen.png" alt="Pipeline for Agentic Textured Object Generation.">
@@ -245,14 +253,6 @@
                         </figcaption>
                     </figure>
                 </d-figure>
-
-                <p class="text">
-                    <strong>VLM-Guided Multi-View Synthesis.</strong> A VLM agent selects informative keyframes to synthesize orthogonal object views. A VLM critic filters generated images via rejection sampling to ensure consistency with video observations.
-                </p>
-
-                <p class="text">
-                    <strong>3D Lifting and Mesh Refinement.</strong> Validated views are processed to generate an initial mesh, then refined through automated retopology and VLM-supervised texture enhancement, producing simulation-ready assets with high-fidelity appearance.
-                </p>
 
                 <h2 class="text">Stage 2: Hand-Object Interaction Optimization</h2>
                 <p class="text">
