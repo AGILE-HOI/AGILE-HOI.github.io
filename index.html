@@ -248,11 +248,11 @@
 
                 <h2 class="text">Stage 2: Hand-Object Interaction Optimization</h2>
                 <p class="text">
-                    We establish metric initialization using foundation models (MoGe-2 for depth, SAM2 for segmentation). The hand is initialized via WiLoR with scale recovered through ICP. For the object, we identify the <i>interaction onset frame</i> and apply FoundationPose using our generated mesh.
+                    We establish metric initialization using foundation models (MoGe-2 for depth, SAM2 for segmentation). The hand is initialized via WiLoR with scale recovered through ICP. For the object, we identify the interaction onset frame and apply FoundationPose using our generated mesh.
                 </p>
 
                 <p class="text">
-                    Starting from this frame, we perform bi-directional optimization. For each frame, we refine hand translation via joint reprojection, then optimize object pose using mask alignment, DINO semantic features, and <i>interaction stability constraints</i> that prevent penetration and lock the object to the grasping hand.
+                    Starting from this frame, we perform bi-directional optimization. For each frame, we refine hand translation via joint reprojection, then optimize object pose using mask alignment, DINO semantic features, and interaction stability constraints that prevent penetration and lock the object to the grasping hand.
                 </p>
 
                 <d-figure id="fig-pipeline">
