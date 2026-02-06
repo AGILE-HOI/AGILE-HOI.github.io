@@ -3,8 +3,8 @@
 // Video data structure
 const videos = {
     reconstruction: [
-        {src: 'static/videos/ABF12.mp4', thumb: 'static/videos/ABF12/ABF12_cut.mp4', label: 'ABF12', hasGT: true},
         {src: 'static/videos/GSF13.mp4', thumb: 'static/videos/GSF13/GSF13_cut.mp4', label: 'GSF13', hasGT: true},
+        {src: 'static/videos/ABF12.mp4', thumb: 'static/videos/ABF12/ABF12_cut.mp4', label: 'ABF12', hasGT: true},
         {src: 'static/videos/SM4.mp4', thumb: 'static/videos/SM4/SM4_cut.mp4', label: 'SM4', hasGT: true},
         {src: 'static/videos/MDF12.mp4', thumb: 'static/videos/MDF12/MDF12_cut.mp4', label: 'MDF12', hasGT: true},
         {src: 'static/videos/dexycb_01_resized.mp4', thumb: 'static/videos/dexycb_01/input_dexycb_01_20200709_141754_836212060125_cut_cropped.mp4', label: 'DexYCB-01', hasGT: true},
@@ -87,6 +87,13 @@ function loadShowcase(vizType) {
     if (!showcase || !mainVideo) return;
 
     showcase.innerHTML = '';
+
+    // Set the first video as the main video
+    if (videos[vizType].length > 0) {
+        mainVideo.src = videos[vizType][0].src;
+        mainVideo.load();
+    }
+
     videos[vizType].forEach((video, index) => {
         const thumb = document.createElement('div');
         thumb.className = 'showcase-thumb' + (index === 0 ? ' active' : '');
