@@ -4,6 +4,7 @@
 const quantitativeData = {
     dexycb: {
         name: 'DexYCB',
+        survivorBias: true,
         methods: ['Ours', 'HOLD', 'MagicHOI'],
         metrics: {
             mpjpe: {
@@ -47,6 +48,7 @@ const quantitativeData = {
     },
     ho3d: {
         name: 'HO3D-v3',
+        survivorBias: true,
         methods: ['Ours', 'HOLD', 'MagicHOI'],
         metrics: {
             mpjpe: {
@@ -87,6 +89,48 @@ const quantitativeData = {
             }
         },
         successRates: [100.0, 100.0, 83.3]
+    },
+    arctic: {
+        name: 'ARCTIC',
+        methods: ['Ours', 'HOLD', 'BIGS'],
+        metrics: {
+            mpjpe_l: {
+                name: 'MPJPE-L (mm)',
+                values: [25.0, 27.1, 34.1],
+                lowerIsBetter: true,
+                description: 'Left-hand pose accuracy'
+            },
+            mpjpe_r: {
+                name: 'MPJPE-R (mm)',
+                values: [23.8, 24.7, 36.1],
+                lowerIsBetter: true,
+                description: 'Right-hand pose accuracy'
+            },
+            cd_o: {
+                name: 'CD-O (cm²)',
+                values: [1.12, 2.07, 1.36],
+                lowerIsBetter: true,
+                description: 'Object geometry fidelity'
+            },
+            f5: {
+                name: 'F@5mm (%)',
+                values: [57.6, 37.1, 56.4],
+                lowerIsBetter: false,
+                description: 'Precision at 5mm threshold'
+            },
+            cd_l: {
+                name: 'CD-L (cm²)',
+                values: [21.9, 105.9, 46.1],
+                lowerIsBetter: true,
+                description: 'Left hand-relative object'
+            },
+            cd_r: {
+                name: 'CD-R (cm²)',
+                values: [30.6, 123.5, 31.3],
+                lowerIsBetter: true,
+                description: 'Right hand-relative object'
+            }
+        }
     }
 };
 
@@ -94,7 +138,8 @@ const quantitativeData = {
 const methodColors = {
     'Ours': '#8B9D6F',      // Warm green/olive
     'HOLD': '#7B9CB8',       // Soft blue
-    'MagicHOI': '#D4A574'    // Warm orange/terracotta
+    'MagicHOI': '#D4A574',   // Warm orange/terracotta
+    'BIGS': '#9D8DB8'        // Muted purple
 };
 
 // Current state
@@ -207,7 +252,7 @@ function renderTable(dataset) {
         html += `<tr class="${rowClass}">`;
 
         // Method name with footnote for baselines
-        const footnote = method !== 'Ours' ? '<sup>†</sup>' : '';
+        const footnote = (method !== 'Ours' && data.survivorBias) ? '<sup>†</sup>' : '';
         html += `<td>${method}${footnote}</td>`;
 
         // Metric values

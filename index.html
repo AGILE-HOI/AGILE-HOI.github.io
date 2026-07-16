@@ -382,9 +382,9 @@
             <div class="sub-section">
                 <h1 class="text" style="margin-top: 60px;">Quantitative Results</h1>
                 <p class="text">
-                    We conduct extensive quantitative evaluation on HO3D-v3<d-cite key="hampali2020honnotate"></d-cite> and DexYCB<d-cite key="chao2021dexycb"></d-cite> datasets,
-                    comparing AGILE against state-of-the-art methods HOLD<d-cite key="fan2024hold"></d-cite>
-                    and MagicHOI<d-cite key="wang2025magichoi"></d-cite> across
+                    We conduct extensive quantitative evaluation on HO3D-v3<d-cite key="hampali2020honnotate"></d-cite>, DexYCB<d-cite key="chao2021dexycb"></d-cite>, and ARCTIC datasets,
+                    comparing AGILE against state-of-the-art methods HOLD<d-cite key="fan2024hold"></d-cite>,
+                    MagicHOI<d-cite key="wang2025magichoi"></d-cite>, and BIGS<d-cite key="on2025bigs"></d-cite> across
                     multiple metrics including hand pose accuracy (MPJPE), object geometry fidelity (CD, F-scores),
                     interaction quality (CD<sub>h</sub>), and success rate (SR).
                 </p>
@@ -393,6 +393,7 @@
                 <div class="dataset-switch">
                     <button class="dataset-btn active" data-dataset="ho3d">HO3D-v3</button>
                     <button class="dataset-btn" data-dataset="dexycb">DexYCB</button>
+                    <button class="dataset-btn" data-dataset="arctic">ARCTIC</button>
                 </div>
 
                 <!-- View Toggle - Hidden -->
@@ -418,7 +419,7 @@
 
                 <p class="text note" style="font-size: 0.9em; color: #666; margin-top: 20px;">
                     <strong>Note:</strong> Baseline metrics (<sup>†</sup>) are averaged over successful sequences only (survivor bias).
-                    AGILE achieves 100% success rate on both datasets, while HOLD fails on 55% of DexYCB
+                    AGILE achieves 100% success rate on HO3D-v3 and DexYCB, while HOLD fails on 55% of DexYCB
                     sequences and MagicHOI fails on 75%.
                 </p>
             </div>
