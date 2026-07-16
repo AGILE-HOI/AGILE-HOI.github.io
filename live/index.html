@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>AGILE · Live — Hand-Object Interaction Reconstruction</title>
+  <link rel="icon" type="image/png" href="../static/img/icons/agile_icon.png">
+  <link rel="stylesheet" href="./css/fonts.css">
+  <link rel="stylesheet" href="./css/live.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./vendor/three.module.js",
+      "three/addons/": "./vendor/addons/"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <!-- atmospheric backdrop -->
+  <div class="fx fx-glow"></div>
+  <div class="fx fx-grid"></div>
+  <div class="fx fx-scan"></div>
+  <div class="fx fx-grain"></div>
+  <div class="fx fx-vignette"></div>
+
+  <!-- start / fullscreen gate -->
+  <div class="gate" id="gate">
+    <div class="gate-inner">
+      <div class="gate-eyebrow">SIGGRAPH 2026 · Conference Track · Live Demo</div>
+      <div class="gate-mark">AGILE<b>·</b>LIVE</div>
+      <h1 class="gate-title">Hand-Object Interaction Reconstruction from Video via Agentic Generation</h1>
+      <div class="gate-authors">
+        Jin-Chuan Shi<sup>1,*</sup>, Binhong Ye<sup>1,*</sup>, Tao Liu<sup>1</sup>, Junzhe He<sup>1</sup>,
+        Yangjinhui Xu<sup>1</sup>, Xiaoyang Liu<sup>1</sup>, Zeju Li<sup>1</sup>, Hao Chen<sup>1</sup>, Chunhua Shen<sup>1,2</sup>
+      </div>
+      <div class="gate-affil"><sup>1</sup> State Key Lab of CAD &amp; CG, Zhejiang University &nbsp;·&nbsp; <sup>2</sup> Zhejiang University of Technology &nbsp;·&nbsp; * Equal contribution</div>
+      <div class="gate-actions">
+        <button class="gate-btn" id="gate-start">Begin Demo →</button>
+        <div class="gate-qr">
+          <img src="./img/qr-projpage.svg" alt="QR code — AGILE project page">
+          <span>Scan for <b>paper</b>, <b>code</b><br>&amp; project page</span>
+        </div>
+      </div>
+      <div class="gate-hint">agile-hoi.github.io · best viewed fullscreen</div>
+    </div>
+  </div>
+
+  <div id="app">
+    <!-- topbar -->
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">AGILE<b>·</b>LIVE</span>
+        <span class="brand-sub">HOI Reconstruction</span>
+      </div>
+      <nav class="tabs">
+        <button class="tab is-active" data-section="recon"><span class="idx">01</span>Reconstruction</button>
+        <button class="tab" data-section="rotation"><span class="idx">02</span>360° Geometry</button>
+        <button class="tab" data-section="retarget"><span class="idx">03</span>Real-to-Sim</button>
+        <button class="tab" data-section="bench"><span class="idx">04</span>Benchmarks</button>
+        <button class="tab" data-section="explain"><span class="idx">05</span>How It Works</button>
+      </nav>
+      <div class="venue">
+        <span class="chip">SIGGRAPH 2026</span>
+        <span class="status"><span class="dot"></span>LIVE</span>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- ============ RECONSTRUCTION (interactive 3D) ============ -->
+      <section class="section is-active" id="sec-recon">
+        <div class="stage-area">
+          <div class="stage-frame" id="stage-frame">
+            <div id="viewer-stage"></div>
+            <i class="reticle tl"></i><i class="reticle tr"></i>
+            <i class="reticle bl"></i><i class="reticle br"></i>
+            <div class="scanline"></div>
+
+            <div class="stage-caption">
+              <div class="cap-tag"><span class="bar"></span><span>Reconstructed · Monocular Video</span></div>
+              <div class="cap-object" id="cap-object">—</div>
+              <div class="cap-line" id="cap-line"></div>
+            </div>
+
+            <div class="attract-cta"><span class="hand">◎</span> Drag to explore · tap a sequence</div>
+
+            <div class="loadbar">
+              <div class="loadbar-head">
+                <span class="loadbar-text" id="load-text">Initializing…</span>
+                <span class="loadbar-pct" id="load-pct">0%</span>
+              </div>
+              <div class="loadbar-track"><div class="loadbar-fill" id="load-fill"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- reset camera view (explore only) -->
+        <button class="reset-view hud" id="reset-view" title="Reset camera view">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="6.4"/><path d="M12 2.4v3.2M12 18.4v3.2M2.4 12h3.2M18.4 12h3.2"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>
+          <span>Reset View</span>
+        </button>
+
+        <!-- gallery -->
+        <aside class="gallery hud panel">
+          <div class="panel-h"><i class="k"></i><h4>Sequences</h4></div>
+          <div class="gallery-list" id="gallery-list"></div>
+        </aside>
+
+        <!-- telemetry -->
+        <aside class="telemetry hud panel">
+          <div class="panel-h"><i class="k"></i><h4>Telemetry</h4></div>
+          <div class="telem-body">
+            <div class="telem-row"><span class="telem-k">Signal</span><span class="telem-v" style="color:var(--mint)">● TRACKING</span></div>
+            <div class="telem-row"><span class="telem-k">Object</span><span class="telem-v" id="t-object">—</span></div>
+            <div class="telem-row"><span class="telem-k">Source</span><span class="telem-v" id="t-source">—</span></div>
+            <div class="telem-row"><span class="telem-k">Frame</span><span class="telem-v hi" id="t-frame">—</span></div>
+            <div class="telem-row"><span class="telem-k">Render</span><span class="telem-v" id="t-render">— FPS</span></div>
+            <div class="telem-row"><span class="telem-k">View</span><span class="telem-v" id="t-view">AUTO-ORBIT</span></div>
+            <div class="telem-row"><span class="telem-k">Mesh</span><span class="telem-v vi">WATERTIGHT</span></div>
+          </div>
+        </aside>
+
+        <!-- transport -->
+        <div class="transport hud panel">
+          <div class="tp-group">
+            <button class="tp-btn" id="tp-prev" title="Previous frame"></button>
+            <button class="tp-btn tp-play" id="tp-play" title="Play / pause"></button>
+            <button class="tp-btn" id="tp-next" title="Next frame"></button>
+          </div>
+          <div class="scrub">
+            <div class="scrub-head">
+              <span class="scrub-label">Frame</span>
+              <span class="frame-count" id="frame-count">001<span class="tot"> / 0</span></span>
+            </div>
+            <input type="range" id="scrub" min="0" max="100" value="0" aria-label="Frame">
+          </div>
+          <div class="tp-sep"></div>
+          <div class="opacity">
+            <div class="scrub-head">
+              <span class="scrub-label">Video overlay</span>
+              <span id="op-val">35%</span>
+            </div>
+            <input type="range" id="opacity" min="0" max="100" value="35" aria-label="Video overlay opacity">
+          </div>
+          <div class="tp-sep"></div>
+          <div class="tp-group">
+            <button class="tp-btn" id="tp-reset" title="Reset view"></button>
+            <button class="tp-btn" id="tp-spin" title="Auto-orbit"></button>
+            <button class="tp-btn" id="tp-frustum" title="Camera frustum"></button>
+            <button class="tp-btn" id="tp-full" title="Fullscreen"></button>
+          </div>
+        </div>
+
+        <!-- paper credit + QR — expanded when idle, compact QR chip while exploring -->
+        <aside class="paper-credit" id="paper-credit" aria-label="Paper and project page">
+          <div class="pc-qr"><img src="./img/qr-projpage.svg" alt="QR code — AGILE project page"></div>
+          <div class="pc-info">
+            <div class="pc-title">AGILE</div>
+            <div class="pc-authors">J-C. Shi, B. Ye, et&nbsp;al. · Zhejiang University · SIGGRAPH 2026</div>
+            <div class="pc-scan">Scan for paper, code &amp; project page</div>
+          </div>
+        </aside>
+      </section>
+
+      <!-- ============ built by JS ============ -->
+      <section class="section" id="sec-rotation"></section>
+      <section class="section" id="sec-retarget"></section>
+      <section class="section" id="sec-bench"></section>
+      <section class="section" id="sec-explain"></section>
+    </main>
+  </div>
+
+  <script type="module">
+    import { init } from './js/director.js';
+    init();
+  </script>
+</body>
+</html>

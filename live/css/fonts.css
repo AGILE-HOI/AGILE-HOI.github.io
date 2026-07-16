@@ -1,0 +1,49 @@
+/* fonts.css — self-hosted (offline). Latin subset only. */
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../fonts/jbmono-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/jbmono-700.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Saira';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/saira-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Saira';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../fonts/saira-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Saira Semi Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/saira-sc-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Saira Semi Condensed';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/saira-sc-700.woff2') format('woff2');
+}
