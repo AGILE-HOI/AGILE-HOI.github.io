@@ -368,6 +368,33 @@ video#agile-demo,
   /* White text on hover */
 }
 
+/* Interactive live-demo button — dark + neon-cyan accent so it stands out */
+.button-container a.button.demo-link {
+  background-color: #0d1322;
+  color: #eaf6ff;
+  border-color: #3fe1ff;
+  box-shadow: 0 0 14px rgba(63, 225, 255, 0.35);
+}
+.button-container a.button.demo-link:hover {
+  background-color: #12a9d6;
+  color: #04060d;
+}
+.button-container a.button.demo-link .live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #5cffc0;
+  box-shadow: 0 0 8px #5cffc0;
+  margin-right: 7px;
+  vertical-align: middle;
+  animation: agileLivePulse 1.6s ease-in-out infinite;
+}
+@keyframes agileLivePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
 /* Styles for larger screens using a media query */
 @media (min-width: 600px) {
   .header-container {

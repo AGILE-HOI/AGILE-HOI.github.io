@@ -16,7 +16,7 @@ the QR code are all bundled.
 Serve from the **repo root** (the parent of `live/`), then open `/live/`:
 
 ```bash
-cd /Users/jc/codes/AGILE/AGILE-HOI.github.io
+# from the repo root (the folder that contains live/ and static/):
 
 # recommended: no-cache server (edits show up on a plain refresh)
 python3 live/serve.py
